@@ -1,7 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
+import { Suspense } from "react";
 import { useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -42,7 +41,7 @@ const ACADEMIC_LEVELS = [
 
 const STEPS = ["Order Details", "Urgency & Price", "Review & Pay"];
 
-export default function NewOrderPage() {
+function NewOrderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEmergencyMode = searchParams.get("mode") === "emergency";
@@ -505,5 +504,13 @@ export default function NewOrderPage() {
             </div>
           </div>
     </div>
+  );
+}
+
+export default function NewOrderPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>}>
+      <NewOrderContent />
+    </Suspense>
   );
 }
