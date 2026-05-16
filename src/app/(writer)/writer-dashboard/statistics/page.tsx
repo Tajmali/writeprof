@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Star, Clock, CheckCircle, FileText } from "lucide-react";
@@ -71,15 +71,15 @@ export default function StatisticsPage() {
           >
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="w-4 h-4 text-brand-400" />
-              <h3 className="text-white font-semibold text-sm">Monthly Earnings (₦)</h3>
+              <h3 className="text-white font-semibold text-sm">Monthly Earnings ($)</h3>
             </div>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={earningsData} barSize={24}>
                 <XAxis dataKey="month" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                <YAxis tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
                   contentStyle={{ background: "#1e293b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#e2e8f0" }}
-                  formatter={(v: number) => [`₦${v.toLocaleString()}`, "Earnings"]}
+                  formatter={(v: number) => [`$${v.toLocaleString()}`, "Earnings"]}
                 />
                 <Bar dataKey="earnings" fill="url(#brandGrad)" radius={[6, 6, 0, 0]} />
                 <defs>
@@ -120,3 +120,4 @@ export default function StatisticsPage() {
     </div>
   );
 }
+

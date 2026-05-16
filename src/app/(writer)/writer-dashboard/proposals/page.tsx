@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { Send, Clock, CheckCircle, XCircle, FileText } from "lucide-react";
@@ -10,7 +10,7 @@ const mockProposals = [
     client: "Client #4821",
     submittedAt: "2 hours ago",
     deadline: "6 hours",
-    budget: "₦18,000",
+    budget: "$18,000",
     status: "pending",
     wordCount: 2500,
   },
@@ -20,17 +20,17 @@ const mockProposals = [
     client: "Client #3907",
     submittedAt: "5 hours ago",
     deadline: "12 hours",
-    budget: "₦24,000",
+    budget: "$24,000",
     status: "accepted",
     wordCount: 3000,
   },
   {
     id: "3",
-    title: "SEO Blog Post — Digital Marketing",
+    title: "SEO Blog Post â€” Digital Marketing",
     client: "Client #5532",
     submittedAt: "1 day ago",
     deadline: "24 hours",
-    budget: "₦9,600",
+    budget: "$9,600",
     status: "rejected",
     wordCount: 1200,
   },
@@ -121,3 +121,4 @@ export default function ProposalsPage() {
     </div>
   );
 }
+

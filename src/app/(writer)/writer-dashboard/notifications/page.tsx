@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { Bell, CheckCircle, FileText, Wallet, Star, Info } from "lucide-react";
@@ -8,7 +8,7 @@ const notifications = [
     id: "1",
     type: "order",
     title: "New order available!",
-    message: "A 2,500-word research paper on Renewable Energy — deadline in 6 hours.",
+    message: "A 2,500-word research paper on Renewable Energy â€” deadline in 6 hours.",
     time: "2 min ago",
     read: false,
     icon: FileText,
@@ -18,8 +18,8 @@ const notifications = [
   {
     id: "2",
     type: "payment",
-    title: "Payment released 💰",
-    message: "₦14,400 has been added to your wallet for completing Order #ORD-00821.",
+    title: "Payment released ðŸ’°",
+    message: "$14,400 has been added to your wallet for completing Order #ORD-00821.",
     time: "1 hour ago",
     read: false,
     icon: Wallet,
@@ -51,7 +51,7 @@ const notifications = [
   {
     id: "5",
     type: "info",
-    title: "Profile approved ✅",
+    title: "Profile approved âœ…",
     message: "Your writer profile has been reviewed and approved by our team. You can now bid on orders.",
     time: "2 days ago",
     read: true,
@@ -125,3 +125,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

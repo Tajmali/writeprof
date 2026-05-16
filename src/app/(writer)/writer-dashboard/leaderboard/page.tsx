@@ -1,16 +1,16 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { Trophy, Star, Medal } from "lucide-react";
 
 const leaderboard = [
-  { rank: 1, name: "Dr. Sarah K.", avatar: "SK", orders: 312, rating: 5.0, earnings: "₦4.2M", badge: "Elite Pro" },
-  { rank: 2, name: "James O.", avatar: "JO", orders: 278, rating: 4.98, earnings: "₦3.8M", badge: "Top Writer" },
-  { rank: 3, name: "Amelia R.", avatar: "AR", orders: 241, rating: 4.97, earnings: "₦3.1M", badge: "Top Writer" },
-  { rank: 4, name: "Michael T.", avatar: "MT", orders: 198, rating: 4.95, earnings: "₦2.6M", badge: "Rising Star" },
-  { rank: 5, name: "You", avatar: "ME", orders: 91, rating: 4.90, earnings: "₦1.2M", badge: "Rising Star", isMe: true },
-  { rank: 6, name: "Linda W.", avatar: "LW", orders: 87, rating: 4.88, earnings: "₦1.1M", badge: "Active" },
-  { rank: 7, name: "Charles B.", avatar: "CB", orders: 74, rating: 4.85, earnings: "₦980K", badge: "Active" },
+  { rank: 1, name: "Dr. Sarah K.", avatar: "SK", orders: 312, rating: 5.0, earnings: "$4.2M", badge: "Elite Pro" },
+  { rank: 2, name: "James O.", avatar: "JO", orders: 278, rating: 4.98, earnings: "$3.8M", badge: "Top Writer" },
+  { rank: 3, name: "Amelia R.", avatar: "AR", orders: 241, rating: 4.97, earnings: "$3.1M", badge: "Top Writer" },
+  { rank: 4, name: "Michael T.", avatar: "MT", orders: 198, rating: 4.95, earnings: "$2.6M", badge: "Rising Star" },
+  { rank: 5, name: "You", avatar: "ME", orders: 91, rating: 4.90, earnings: "$1.2M", badge: "Rising Star", isMe: true },
+  { rank: 6, name: "Linda W.", avatar: "LW", orders: 87, rating: 4.88, earnings: "$1.1M", badge: "Active" },
+  { rank: 7, name: "Charles B.", avatar: "CB", orders: 74, rating: 4.85, earnings: "$980K", badge: "Active" },
 ];
 
 const rankConfig: Record<number, { color: string; icon: React.ElementType }> = {
@@ -123,3 +123,4 @@ export default function LeaderboardPage() {
     </div>
   );
 }
+
