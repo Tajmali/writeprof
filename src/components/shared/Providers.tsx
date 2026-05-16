@@ -24,7 +24,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true}>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="writeprof-theme">
       <QueryClientProvider client={queryClient}>
         <AuthInitializer />
         {children}
