@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   ArrowRight, Search, Clock, BookOpen, CheckCircle2,
-  XCircle, Loader2, RotateCcw, Eye, AlertCircle
+  XCircle, Loader2, RotateCcw, Eye, AlertCircle, ChevronDown
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CountdownTimer } from "@/components/dashboard/CountdownTimer";
@@ -41,6 +41,15 @@ const SUB_FILTERS = [
 
 type SubFilter = typeof SUB_FILTERS[number]["key"];
 
+const SORT_OPTIONS = [
+  { key: "default",          label: "Default" },
+  { key: "newest",           label: "New orders first" },
+  { key: "deadline_asc",     label: "Shorter deadline first" },
+  { key: "deadline_desc",    label: "Longer deadline first" },
+] as const;
+
+type SortKey = typeof SORT_OPTIONS[number]["key"];
+
 const STATUS_BADGE: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   IN_PROGRESS: { label: "In Progress", color: "text-brand-400",  bg: "bg-brand-500/10 border-brand-500/20",   icon: Loader2 },
   IN_REVIEW:   { label: "In Review",   color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20", icon: Eye },
@@ -54,9 +63,11 @@ const STATUS_BADGE: Record<string, { label: string; color: string; bg: string; i
 
 export default function WriterOrdersPage() {
   const qc = useQueryClient();
-  const [mainTab, setMainTab]   = useState<MainTab>("inprogress");
+  const [mainTab, setMainTab]     = useState<MainTab>("inprogress");
   const [subFilter, setSubFilter] = useState<SubFilter>("ALL");
-  const [search, setSearch]     = useState("");
+  const [search, setSearch]       = useState("");
+  const [sortKey, setSortKey]     = useState<SortKey>("default");
+  const [sortOpen, setSortOpen]   = useState(false);
 
   // Decide which statuses to fetch based on active main tab
   const statusMap: Record<MainTab, string[]> = {
@@ -85,14 +96,21 @@ export default function WriterOrdersPage() {
     onError: (e: Error) => toast.error(e.message || "Failed to accept order"),
   });
 
-  // Apply sub-filter + search
-  const filtered = orders.filter((o: Order) => {
-    const matchSub    = mainTab !== "inprogress" || subFilter === "ALL" || o.status === subFilter;
-    const matchSearch = !search ||
-      o.title.toLowerCase().includes(search.toLowerCase()) ||
-      o.category.toLowerCase().includes(search.toLowerCase());
-    return matchSub && matchSearch;
-  });
+  // Apply sub-filter + search + sort
+  const filtered = orders
+    .filter((o: Order) => {
+      const matchSub    = mainTab !== "inprogress" || subFilter === "ALL" || o.status === subFilter;
+      const matchSearch = !search ||
+        o.title.toLowerCase().includes(search.toLowerCase()) ||
+        o.category.toLowerCase().includes(search.toLowerCase());
+      return matchSub && matchSearch;
+    })
+    .sort((a: Order, b: Order) => {
+      if (sortKey === "newest")        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortKey === "deadline_asc")  return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      if (sortKey === "deadline_desc") return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
+      return 0;
+    });
 
   // Counts per sub-filter
   const subCounts: Record<SubFilter, number> = {
@@ -106,6 +124,7 @@ export default function WriterOrdersPage() {
     setMainTab(tab);
     setSubFilter("ALL");
     setSearch("");
+    setSortKey("default");
   };
 
   return (
@@ -142,7 +161,7 @@ export default function WriterOrdersPage() {
           ))}
         </div>
 
-        {/* Single search bar — right of Cancelled */}
+        {/* Search bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
@@ -151,6 +170,43 @@ export default function WriterOrdersPage() {
             placeholder="Search orders..."
             className="input-field pl-9 w-52"
           />
+        </div>
+
+        {/* Sort dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setSortOpen((v) => !v)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/5 text-sm text-slate-300 hover:text-white hover:border-white/10 transition-all"
+          >
+            <span>{SORT_OPTIONS.find((o) => o.key === sortKey)?.label ?? "Default"}</span>
+            <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
+          </button>
+
+          <AnimatePresence>
+            {sortOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-0 top-full mt-2 w-52 bg-slate-900 border border-white/10 rounded-xl shadow-xl overflow-hidden z-50"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.key}
+                    onClick={() => { setSortKey(opt.key); setSortOpen(false); }}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                      ${sortKey === opt.key
+                        ? "bg-brand-500/20 text-brand-400 font-semibold"
+                        : "text-slate-400 hover:bg-white/5 hover:text-white"
+                      }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
