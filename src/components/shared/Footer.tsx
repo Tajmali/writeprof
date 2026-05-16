@@ -28,7 +28,7 @@ const footerLinks = {
   Support: [
     { label: "Help Center", href: "/help" },
     { label: "Contact Us", href: "/contact" },
-    { label: "Live Chat", href: "/chat" },
+    { label: "Live Chat", href: "/contact" },
     { label: "Refund Policy", href: "/refund" },
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
