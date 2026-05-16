@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/shared/Providers";
+import { SupportChat } from "@/components/shared/SupportChat";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -130,6 +131,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-[#020817] antialiased">
         <Providers>{children}</Providers>
+        <SupportChat />
         <Toaster
           position="top-right"
           toastOptions={{
