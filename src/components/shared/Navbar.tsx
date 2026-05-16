@@ -2,21 +2,22 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Zap, ChevronDown } from "lucide-react";
 import { useAuthStore } from "@/store";
 
 const navLinks = [
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Services", href: "#categories" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Writers", href: "#writers" },
+  { label: "How It Works", href: "/#how-it-works", sectionId: "how-it-works" },
+  { label: "Services",     href: "/#categories",   sectionId: "categories" },
+  { label: "Pricing",      href: "/#pricing",       sectionId: "pricing" },
+  { label: "Writers",      href: "/#writers",       sectionId: "writers" },
   {
     label: "Resources",
     href: "#",
     children: [
-      { label: "Blog", href: "/blog" },
-      { label: "FAQ", href: "#faq" },
+      { label: "Blog",     href: "/blog" },
+      { label: "FAQ",      href: "/#faq", sectionId: "faq" },
       { label: "About Us", href: "/about" },
     ],
   },
@@ -27,12 +28,27 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const { user } = useAuthStore();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSectionClick = (e: React.MouseEvent, sectionId?: string) => {
+    if (!sectionId) return;
+    e.preventDefault();
+    setMobileOpen(false);
+    if (pathname === "/") {
+      // Already on homepage — just smooth scroll
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      // Navigate to homepage then scroll after load
+      router.push(`/#${sectionId}`);
+    }
+  };
 
   return (
     <motion.header
@@ -85,6 +101,7 @@ export function Navbar() {
                           <Link
                             key={child.label}
                             href={child.href}
+                            onClick={(e) => handleSectionClick(e, (child as any).sectionId)}
                             className="block px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
                           >
                             {child.label}
@@ -98,6 +115,7 @@ export function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
+                  onClick={(e) => handleSectionClick(e, link.sectionId)}
                   className="px-4 py-2 text-slate-300 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200 text-sm font-medium"
                 >
                   {link.label}
@@ -162,7 +180,7 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     className="block px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all text-sm font-medium"
-                    onClick={() => setMobileOpen(false)}
+                    onClick={(e) => { handleSectionClick(e, link.sectionId); setMobileOpen(false); }}
                   >
                     {link.label}
                   </Link>
@@ -171,7 +189,7 @@ export function Navbar() {
                       key={child.label}
                       href={child.href}
                       className="block pl-8 pr-4 py-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all text-sm"
-                      onClick={() => setMobileOpen(false)}
+                      onClick={(e) => { handleSectionClick(e, (child as any).sectionId); setMobileOpen(false); }}
                     >
                       {child.label}
                     </Link>
