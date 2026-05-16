@@ -1,15 +1,25 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell, Menu, Search, Moon, Sun, ChevronDown } from "lucide-react";
+import { Bell, Menu, Search, Moon, Sun, Monitor, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { useAuthStore, useUIStore, useNotificationStore } from "@/store";
+
+const THEME_OPTIONS = [
+  { key: "dark",   label: "Dark Mode",  icon: Moon },
+  { key: "light",  label: "Light Mode", icon: Sun },
+  { key: "system", label: "System",     icon: Monitor },
+] as const;
 
 export function DashboardHeader() {
   const { user } = useAuthStore();
-  const { toggleSidebar, theme, toggleTheme } = useUIStore();
+  const { toggleSidebar } = useUIStore();
+  const { theme, setTheme } = useTheme();
   const { notifications, unreadCount, markAllAsRead } = useNotificationStore();
+  const [themeOpen, setThemeOpen] = useState(false);
+  const themeRef = useRef<HTMLDivElement>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -17,6 +27,9 @@ export function DashboardHeader() {
     function handleClickOutside(e: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
         setShowNotifications(false);
+      }
+      if (themeRef.current && !themeRef.current.contains(e.target as Node)) {
+        setThemeOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -46,13 +59,45 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-2 ml-auto">
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all"
-        >
-          {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </button>
+        {/* Theme dropdown */}
+        <div className="relative" ref={themeRef}>
+          <button
+            onClick={() => setThemeOpen((v) => !v)}
+            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            title="Change theme"
+          >
+            {theme === "light"  ? <Sun className="w-4 h-4" />     :
+             theme === "system" ? <Monitor className="w-4 h-4" /> :
+             <Moon className="w-4 h-4" />}
+          </button>
+
+          <AnimatePresence>
+            {themeOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 top-full mt-2 w-44 bg-slate-900 border border-white/10 rounded-xl shadow-xl overflow-hidden z-50"
+              >
+                {THEME_OPTIONS.map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    onClick={() => { setTheme(key); setThemeOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
+                      ${theme === key
+                        ? "bg-brand-500/20 text-brand-400 font-semibold"
+                        : "text-slate-400 hover:bg-white/5 hover:text-white"
+                      }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Notifications */}
         <div className="relative" ref={notifRef}>
