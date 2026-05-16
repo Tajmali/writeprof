@@ -117,28 +117,41 @@ export default function WriterOrdersPage() {
         <p className="text-slate-400 text-sm mt-1">Track and manage all your writing assignments.</p>
       </div>
 
-      {/* ── Main segment tabs ─────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 p-1 bg-slate-900/60 border border-white/5 rounded-2xl mb-6 w-fit">
-        {MAIN_TABS.map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => handleMainTab(key)}
-            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
-              ${mainTab === key
-                ? "bg-brand-600 text-white shadow-lg shadow-brand-600/30"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-              }`}
-          >
-            <Icon className={`w-4 h-4 ${mainTab === key && key === "inprogress" ? "animate-spin" : ""}`}
-              style={mainTab === key && key === "inprogress" ? { animationDuration: "3s" } : {}} />
-            {label}
-            {key === "inprogress" && orders.length > 0 && mainTab !== "inprogress" && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {orders.length}
-              </span>
-            )}
-          </button>
-        ))}
+      {/* ── Main segment tabs + Search ───────────────────────────────────── */}
+      <div className="flex items-center gap-3 mb-6 flex-wrap">
+        <div className="flex items-center gap-2 p-1 bg-slate-900/60 border border-white/5 rounded-2xl">
+          {MAIN_TABS.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => handleMainTab(key)}
+              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
+                ${mainTab === key
+                  ? "bg-brand-600 text-white shadow-lg shadow-brand-600/30"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+                }`}
+            >
+              <Icon className={`w-4 h-4 ${mainTab === key && key === "inprogress" ? "animate-spin" : ""}`}
+                style={mainTab === key && key === "inprogress" ? { animationDuration: "3s" } : {}} />
+              {label}
+              {key === "inprogress" && orders.length > 0 && mainTab !== "inprogress" && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {orders.length}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Search — sits right next to the tabs */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search orders..."
+            className="input-field pl-9 w-56"
+          />
+        </div>
       </div>
 
       {/* ── Sub-filters (only for In Progress tab) ─────────────────────────── */}
@@ -172,16 +185,6 @@ export default function WriterOrdersPage() {
         )}
       </AnimatePresence>
 
-      {/* ── Search ─────────────────────────────────────────────────────────── */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by title or category..."
-          className="input-field pl-9 w-full max-w-md"
-        />
-      </div>
 
       {/* ── Order cards ────────────────────────────────────────────────────── */}
       {isLoading ? (
