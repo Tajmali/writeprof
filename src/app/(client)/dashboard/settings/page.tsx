@@ -8,9 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
   User, Lock, Bell, Upload, Save, Eye, EyeOff,
-  Loader2, CheckCircle, Moon, Sun, Globe
+  Loader2, CheckCircle, Moon, Sun, Globe, Monitor
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTheme } from "next-themes";
 import { useAuthStore } from "@/store";
 
 const profileSchema = z.object({
@@ -39,12 +40,12 @@ const TABS = [
 
 export default function ClientSettingsPage() {
   const { user, setUser } = useAuthStore();
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("profile");
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNewPw, setShowNewPw] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [theme, setTheme] = useState("dark");
   const [notifications, setNotifications] = useState({
     orderUpdates: true, messages: true, payments: true,
     marketing: false, emailDigest: true,
@@ -326,14 +327,17 @@ export default function ClientSettingsPage() {
                   <label className="text-sm text-gray-400 mb-2 block">Theme</label>
                   <div className="flex gap-2">
                     {[
-                      { id: "dark", label: "Dark", icon: Moon },
-                      { id: "light", label: "Light", icon: Sun },
+                      { id: "dark",   label: "Dark Mode",   icon: Moon },
+                      { id: "light",  label: "Light Mode",  icon: Sun },
+                      { id: "system", label: "System",      icon: Monitor },
                     ].map(t => (
                       <button
                         key={t.id}
                         onClick={() => setTheme(t.id)}
                         className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-medium transition-all ${
-                          theme === t.id ? "border-brand-500/50 bg-brand-500/10 text-brand-400" : "border-white/10 text-gray-400 hover:border-white/20"
+                          theme === t.id
+                            ? "border-brand-500/50 bg-brand-500/10 text-brand-400"
+                            : "border-white/10 text-gray-400 hover:border-white/20"
                         }`}
                       >
                         <t.icon className="w-4 h-4" />
