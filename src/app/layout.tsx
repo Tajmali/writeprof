@@ -94,7 +94,7 @@ const organizationSchema = {
   description: "Emergency writing marketplace connecting clients with professional writers.",
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: "+234-000-0000",
+    email: "oriaventures@gmail.com",
     contactType: "customer service",
     availableLanguage: "English",
   },

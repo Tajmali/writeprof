@@ -65,17 +65,13 @@ export function Footer() {
 
             {/* Contact */}
             <div className="space-y-2.5">
-              <a href="mailto:support@writeprof.com" className="flex items-center gap-2.5 text-slate-500 hover:text-slate-300 transition-colors text-sm">
+              <a href="mailto:oriaventures@gmail.com" className="flex items-center gap-2.5 text-slate-500 hover:text-slate-300 transition-colors text-sm">
                 <Mail className="w-4 h-4" />
-                support@writeprof.com
-              </a>
-              <a href="tel:+2340000000000" className="flex items-center gap-2.5 text-slate-500 hover:text-slate-300 transition-colors text-sm">
-                <Phone className="w-4 h-4" />
-                +234 000 000 0000
+                oriaventures@gmail.com
               </a>
               <div className="flex items-center gap-2.5 text-slate-500 text-sm">
                 <MapPin className="w-4 h-4" />
-                Lagos, Nigeria
+                Palo Alto, United States
               </div>
             </div>
 

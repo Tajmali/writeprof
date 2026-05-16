@@ -39,7 +39,7 @@ export function FAQ() {
           </h2>
           <p className="text-slate-400 text-lg">
             Everything you need to know about WriteProf. Can't find the answer?{" "}
-            <a href="mailto:support@writeprof.com" className="text-brand-400 hover:underline">
+            <a href="mailto:oriaventures@gmail.com" className="text-brand-400 hover:underline">
               Contact our team.
             </a>
           </p>
