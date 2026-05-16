@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap, LayoutDashboard, FileText, Plus, MessageSquare, CreditCard,
   Bell, Settings, LogOut, ChevronLeft, ChevronRight, Users, BarChart3,
-  PenTool, Wallet, Star, Shield, Briefcase, BookOpen, X
+  PenTool, Wallet, Star, Shield, Briefcase, BookOpen, X, Send, Trophy
 } from "lucide-react";
 import { useAuthStore, useUIStore } from "@/store";
 import toast from "react-hot-toast";
@@ -23,13 +23,13 @@ const clientNavItems = [
 ];
 
 const writerNavItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/writer-dashboard" },
   { icon: Briefcase, label: "Available Orders", href: "/writer-dashboard/orders" },
-  { icon: FileText, label: "My Work", href: "/writer-dashboard/work" },
-  { icon: MessageSquare, label: "Messages", href: "/writer-dashboard/chat" },
-  { icon: Wallet, label: "Earnings", href: "/writer-dashboard/earnings" },
-  { icon: Star, label: "Reviews", href: "/writer-dashboard/reviews" },
-  { icon: Settings, label: "Settings", href: "/writer-dashboard/settings" },
+  { icon: Send, label: "My Proposals", href: "/writer-dashboard/proposals" },
+  { icon: MessageSquare, label: "Chats", href: "/writer-dashboard/chat" },
+  { icon: BarChart3, label: "Statistics", href: "/writer-dashboard/statistics" },
+  { icon: Trophy, label: "Leaderboard", href: "/writer-dashboard/leaderboard" },
+  { icon: Wallet, label: "Balance", href: "/writer-dashboard/earnings" },
+  { icon: Bell, label: "Notifications", href: "/writer-dashboard/notifications" },
 ];
 
 const adminNavItems = [
