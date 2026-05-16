@@ -71,8 +71,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Send welcome email to new user (non-blocking)
-    const tmpl = emailTemplates.welcome(user.name);
+    // Send role-specific welcome email to new user (non-blocking)
+    const tmpl = user.role === "WRITER"
+      ? emailTemplates.welcomeWriter(user.name)
+      : emailTemplates.welcomeClient(user.name);
     sendEmail({ to: user.email, subject: tmpl.subject, html: tmpl.html })
       .catch((err) => console.error("Welcome email failed:", err?.message));
 
