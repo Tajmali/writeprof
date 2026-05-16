@@ -71,9 +71,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Send welcome email (non-blocking)
+    // Send welcome email to new user (non-blocking)
     const tmpl = emailTemplates.welcome(user.name);
     sendEmail({ to: user.email, subject: tmpl.subject, html: tmpl.html }).catch(() => {});
+
+    // Notify admin of new signup (non-blocking)
+    const adminTmpl = emailTemplates.adminNewSignup(user.name, user.email, user.role);
+    sendEmail({
+      to: process.env.ADMIN_EMAIL || "oriaventures@gmail.com",
+      subject: adminTmpl.subject,
+      html: adminTmpl.html,
+    }).catch(() => {});
 
     const response = NextResponse.json({
       success: true,
