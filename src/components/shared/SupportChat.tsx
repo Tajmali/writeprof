@@ -12,15 +12,15 @@ interface Message {
 
 const INITIAL_MESSAGE: Message = {
   role: "assistant",
-  content: "Hi there! 👋 I'm Aria, WriteProf's AI support assistant. I can help you with orders, pricing, writer questions, payments, and more. What can I help you with today?",
+  content: "Hi! 🚨 Got a deadline coming up? Don't stress — I'm Aria, and I'm here to help you get it sorted fast. Tell me what you need, how urgent it is, and I'll guide you through every step. You're in good hands! 💙",
   timestamp: new Date(),
 };
 
 const QUICK_REPLIES = [
-  "How does pricing work?",
+  "I have an urgent deadline 🚨",
   "How fast can I get my order?",
-  "How do I become a writer?",
-  "Is my payment secure?",
+  "What's the price for my task?",
+  "I need help with my order",
 ];
 
 export function SupportChat() {
