@@ -140,28 +140,6 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         )}
 
-        {/* Share */}
-        <div className="mt-8 pt-6 border-t border-white/10">
-          <h3 className="text-sm font-semibold text-gray-400 mb-3">Share this article</h3>
-          <div className="flex gap-2">
-            <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(post.title)}`}
-              target="_blank" rel="noreferrer"
-              className="btn-secondary text-sm px-4 py-2">
-              Twitter / X
-            </a>
-            <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
-              target="_blank" rel="noreferrer"
-              className="btn-secondary text-sm px-4 py-2">
-              LinkedIn
-            </a>
-            <a href={`https://wa.me/?text=${encodeURIComponent(post.title + " " + shareUrl)}`}
-              target="_blank" rel="noreferrer"
-              className="btn-secondary text-sm px-4 py-2">
-              WhatsApp
-            </a>
-          </div>
-        </div>
-
         {/* Author Card */}
         <div className="mt-10 glass-card p-5">
           <div className="flex items-start gap-4">

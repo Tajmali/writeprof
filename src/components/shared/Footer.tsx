@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Zap, Mail, Phone, MapPin, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
+import { Zap, Mail, MapPin } from "lucide-react";
 
 const footerLinks = {
   Services: [
@@ -35,12 +35,6 @@ const footerLinks = {
   ],
 };
 
-const socialLinks = [
-  { icon: Twitter, href: "https://twitter.com/writeprof", label: "Twitter" },
-  { icon: Linkedin, href: "https://linkedin.com/company/writeprof", label: "LinkedIn" },
-  { icon: Instagram, href: "https://instagram.com/writeprof", label: "Instagram" },
-  { icon: Youtube, href: "https://youtube.com/@writeprof", label: "YouTube" },
-];
 
 export function Footer() {
   return (
@@ -75,21 +69,6 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Social */}
-            <div className="flex items-center gap-3 mt-6">
-              {socialLinks.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/10 transition-all duration-200"
-                >
-                  <s.icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Link columns */}

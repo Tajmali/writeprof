@@ -49,13 +49,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "WriteProf — Emergency Writing Marketplace",
-    description: "Get urgent writing tasks completed by professionals in 1–24 hours.",
-    images: ["/og-image.png"],
-    creator: "@writeprof",
-  },
   robots: {
     index: true,
     follow: true,
@@ -99,7 +92,6 @@ const organizationSchema = {
     contactType: "customer service",
     availableLanguage: "English",
   },
-  sameAs: ["https://twitter.com/writeprof", "https://linkedin.com/company/writeprof"],
 };
 
 const websiteSchema = {
