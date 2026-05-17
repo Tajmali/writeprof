@@ -20,7 +20,7 @@ const QUICK_REPLIES = [
   "I have an urgent deadline 🚨",
   "How fast can I get my order?",
   "What's the price for my task?",
-  "I need help with my order",
+  "Talk to a human agent",
 ];
 
 export function SupportChat() {
@@ -55,17 +55,21 @@ export function SupportChat() {
     setInput("");
     setIsLoading(true);
 
+    // Detect if user wants a human agent
+    const wantsHuman = /\b(human|person|agent|real person|talk to someone|speak to someone|real support)\b/i.test(text);
+
     try {
       const res = await fetch("/api/support/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: updatedMessages.map((m) => ({ role: m.role, content: m.content })),
+          requestHuman: wantsHuman,
         }),
       });
 
       const data = await res.json();
-      const reply = data.reply || "Sorry, I'm having trouble right now. Please email oriaventures@gmail.com";
+      const reply = data.reply || "I'm here! Let me know what you need and I'll sort it out right away 💙";
 
       const assistantMessage: Message = {
         role: "assistant",
@@ -74,14 +78,14 @@ export function SupportChat() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-
       if (isMinimized) setHasNewMessage(true);
     } catch {
+      // Stay in character even on errors
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Sorry, something went wrong. Please email us at oriaventures@gmail.com and we'll help you right away! 🙏",
+          content: "Hmm, I hit a small snag — but I'm still here! 💙 For the fastest help you can reach us at oriaventures@gmail.com. Want to try again?",
           timestamp: new Date(),
         },
       ]);
