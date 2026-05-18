@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Zap, ChevronDown } from "lucide-react";
 import { useAuthStore } from "@/store";
+import { Logo } from "@/components/shared/Logo";
 
 const navLinks = [
   { label: "How It Works", href: "/#how-it-works", sectionId: "how-it-works" },
@@ -67,16 +68,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/40 group-hover:shadow-brand-500/70 group-hover:scale-105 transition-all duration-300">
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-400/30 to-transparent" />
-              <Zap className="w-5 h-5 text-white relative z-10" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              <span className="text-white">Write</span>
-              <span className="bg-gradient-to-r from-brand-400 to-brand-300 bg-clip-text text-transparent">Prof</span>
-            </span>
-          </Link>
+          <Logo href="/" size={36} showText />
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1">
