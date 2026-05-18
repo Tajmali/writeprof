@@ -265,24 +265,29 @@ export default function ClientSettingsPage() {
                 </button>
               </form>
 
-              {/* Referral Code */}
+              {/* Referral Link */}
               <div className="glass-card p-5 mt-5">
-                <h3 className="font-semibold text-white mb-3">Referral Code</h3>
-                <p className="text-sm text-gray-400 mb-3">Share your referral code and earn rewards when friends sign up</p>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 font-mono text-brand-400 bg-brand-500/10 border border-brand-500/20 rounded-xl px-4 py-2.5 text-center font-bold tracking-widest">
-                    {data?.user?.referralCode || "LOADING..."}
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-semibold text-white">Your Referral Link</h3>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 font-semibold">Free to share</span>
+                </div>
+                <p className="text-sm text-gray-400 mb-4">Share this link — anyone who signs up through it is linked to you. Perfect for earning rewards as we grow.</p>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex-1 font-mono text-brand-400 bg-brand-500/10 border border-brand-500/20 rounded-xl px-3 py-2.5 text-sm truncate">
+                    writeprof.com/ref/{data?.user?.referralCode || "..."}
                   </div>
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(data?.user?.referralCode || "");
-                      toast.success("Copied!");
+                      const link = `https://writeprof.com/ref/${data?.user?.referralCode || ""}`;
+                      navigator.clipboard.writeText(link);
+                      toast.success("Referral link copied!");
                     }}
-                    className="btn-secondary px-4 py-2.5"
+                    className="btn-primary px-4 py-2.5 text-sm flex-shrink-0"
                   >
-                    Copy
+                    Copy Link
                   </button>
                 </div>
+                <p className="text-xs text-gray-600">Your code: <span className="font-mono text-brand-500 font-bold">{data?.user?.referralCode}</span></p>
               </div>
             </motion.div>
           )}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Mail, Lock, User, Phone, Eye, EyeOff, ArrowRight, Chrome, CheckCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -32,12 +32,19 @@ const passwordChecks = [
   { label: "Contains number", check: (p: string) => /\d/.test(p) },
 ];
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState("");
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) setReferralCode(ref.toUpperCase());
+  }, [searchParams]);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -52,7 +59,7 @@ export default function SignupPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, referredBy: referralCode || undefined }),
       });
       const result = await res.json();
 
@@ -91,6 +98,12 @@ export default function SignupPage() {
             Write<span className="gradient-text">Prof</span>
           </span>
         </Link>
+
+        {referralCode && (
+          <div className="mb-4 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm text-center font-medium">
+            🎉 You were referred by a friend! Sign up to get started.
+          </div>
+        )}
 
         <div className="glass-card p-8">
           <div className="text-center mb-6">
@@ -244,5 +257,13 @@ export default function SignupPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#020817]" />}>
+      <SignupForm />
+    </Suspense>
   );
 }

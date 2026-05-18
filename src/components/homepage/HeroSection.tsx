@@ -5,11 +5,11 @@ import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { Zap, Clock, Shield, Star, ArrowRight, CheckCircle } from "lucide-react";
 
-const stats = [
-  { value: 12847, label: "Orders Completed", suffix: "+" },
-  { value: 847, label: "Active Writers", suffix: "+" },
-  { value: 98, label: "On-Time Delivery", suffix: "%" },
-  { value: 4.9, label: "Average Rating", suffix: "/5", decimal: true },
+const DEFAULT_STATS = [
+  { value: 1240, label: "Orders Completed", suffix: "+" },
+  { value: 120,  label: "Active Writers",   suffix: "+" },
+  { value: 98,   label: "On-Time Delivery", suffix: "%" },
+  { value: 4.9,  label: "Average Rating",   suffix: "/5", decimal: true },
 ];
 
 const trustedBy = ["Harvard Students", "Fortune 500 Companies", "Marketing Agencies", "PhD Researchers"];
@@ -91,6 +91,26 @@ function CountdownTimer() {
 }
 
 export function HeroSection() {
+  const [stats, setStats] = useState(DEFAULT_STATS);
+  const [clientCount, setClientCount] = useState(3850);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.success) return;
+        const { ordersCompleted, totalClients, activeWriters, avgRating } = data.data;
+        setStats([
+          { value: ordersCompleted, label: "Orders Completed", suffix: "+" },
+          { value: activeWriters,   label: "Active Writers",   suffix: "+" },
+          { value: 98,              label: "On-Time Delivery", suffix: "%" },
+          { value: avgRating,       label: "Average Rating",   suffix: "/5", decimal: true },
+        ]);
+        setClientCount(totalClients);
+      })
+      .catch(() => {}); // silently keep defaults
+  }, []);
+
   return (
     <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
       {/* Radial glow */}
@@ -200,7 +220,7 @@ export function HeroSection() {
                   ))}
                   <span className="text-white font-semibold ml-1">4.9/5</span>
                 </div>
-                <p className="text-slate-500 text-sm">from 12,847+ verified clients</p>
+                <p className="text-slate-500 text-sm">from {clientCount.toLocaleString()}+ verified clients</p>
               </div>
             </motion.div>
           </div>
