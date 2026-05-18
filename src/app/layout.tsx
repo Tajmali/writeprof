@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/shared/Providers";
-import { SupportChat } from "@/components/shared/SupportChat";
 import { Toaster } from "react-hot-toast";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -123,7 +123,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-[#020817] antialiased">
         <Providers>{children}</Providers>
-        <SupportChat />
+        <Script
+          id="tawk-to"
+          strategy="lazyOnload"
+          dangerouslySetInnerHTML={{
+            __html: `
+              var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+              (function(){
+                var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+                s1.async=true;
+                s1.src='https://embed.tawk.to/6a0ad71f9106c51c398054b3/default';
+                s1.charset='UTF-8';
+                s1.setAttribute('crossorigin','*');
+                s0.parentNode.insertBefore(s1,s0);
+              })();
+            `,
+          }}
+        />
         <Toaster
           position="top-right"
           toastOptions={{
