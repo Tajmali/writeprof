@@ -55,21 +55,26 @@ export function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-[#020817]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl"
-          : "bg-transparent"
+          ? "bg-[#020817]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl shadow-brand-900/20"
+          : "bg-gradient-to-b from-[#020817]/80 via-[#020817]/40 to-transparent backdrop-blur-sm border-b border-white/5"
       }`}
     >
+      {/* Glow accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center shadow-glow-sm group-hover:shadow-glow-md transition-all duration-300">
-              <Zap className="w-5 h-5 text-white" />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/40 group-hover:shadow-brand-500/70 group-hover:scale-105 transition-all duration-300">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-400/30 to-transparent" />
+              <Zap className="w-5 h-5 text-white relative z-10" />
             </div>
-            <span className="text-xl font-bold text-white">
-              Write<span className="gradient-text">Prof</span>
+            <span className="text-xl font-bold tracking-tight">
+              <span className="text-white">Write</span>
+              <span className="bg-gradient-to-r from-brand-400 to-brand-300 bg-clip-text text-transparent">Prof</span>
             </span>
           </Link>
 
@@ -147,7 +152,7 @@ export function Navbar() {
                 >
                   Sign In
                 </Link>
-                <Link href="/signup" className="btn-primary text-sm px-5 py-2.5">
+                <Link href="/signup" className="btn-primary text-sm px-5 py-2.5 shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 transition-shadow duration-300">
                   <Zap className="w-4 h-4" />
                   Get Started Free
                 </Link>
