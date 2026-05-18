@@ -4,8 +4,15 @@ import { Footer } from "@/components/shared/Footer";
 import { RefreshCw, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Refund Policy — WriteProf",
-  description: "WriteProf's refund and dispute resolution policy for clients and writers.",
+  title: "Refund Policy",
+  description: "WriteProf guarantees a full refund if your writer misses the deadline or delivers entirely off-topic work. Read our transparent refund and dispute policy.",
+  alternates: { canonical: "https://writeprof.com/refund" },
+  openGraph: {
+    title: "Refund Policy — WriteProf",
+    description: "Full refund if the writer misses your deadline. Transparent refund and dispute policy.",
+    url: "https://writeprof.com/refund",
+  },
+  robots: { index: true, follow: false },
 };
 
 export default function RefundPage() {

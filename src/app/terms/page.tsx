@@ -4,8 +4,15 @@ import { Footer } from "@/components/shared/Footer";
 import { FileText } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — WriteProf",
-  description: "Terms and conditions for using the WriteProf emergency writing marketplace.",
+  title: "Terms of Service",
+  description: "Terms and conditions governing the use of WriteProf — the emergency writing marketplace connecting clients with professional writers for rush orders.",
+  alternates: { canonical: "https://writeprof.com/terms" },
+  openGraph: {
+    title: "Terms of Service — WriteProf",
+    description: "Terms and conditions for using the WriteProf emergency writing marketplace.",
+    url: "https://writeprof.com/terms",
+  },
+  robots: { index: true, follow: false },
 };
 
 export default function TermsPage() {

@@ -4,8 +4,15 @@ import { Footer } from "@/components/shared/Footer";
 import { Shield } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — WriteProf",
-  description: "How WriteProf collects, uses, and protects your personal information.",
+  title: "Privacy Policy",
+  description: "How WriteProf collects, uses, and protects your personal data. We never sell your information and use bank-grade encryption to keep your account safe.",
+  alternates: { canonical: "https://writeprof.com/privacy" },
+  openGraph: {
+    title: "Privacy Policy — WriteProf",
+    description: "How WriteProf collects, uses, and protects your personal data.",
+    url: "https://writeprof.com/privacy",
+  },
+  robots: { index: true, follow: false },
 };
 
 export default function PrivacyPage() {

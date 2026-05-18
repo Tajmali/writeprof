@@ -84,13 +84,28 @@ const organizationSchema = {
   "@type": "Organization",
   name: "WriteProf",
   url: "https://writeprof.com",
-  logo: "https://writeprof.com/logo.png",
-  description: "Emergency writing marketplace connecting clients with professional writers.",
+  logo: {
+    "@type": "ImageObject",
+    url: "https://writeprof.com/logo.png",
+    width: 200,
+    height: 60,
+  },
+  description: "Emergency writing marketplace connecting clients with vetted professional writers for rush orders with 1–24 hour deadlines.",
+  foundingDate: "2024",
   contactPoint: {
     "@type": "ContactPoint",
-    email: "oriaventures@gmail.com",
-    contactType: "customer service",
+    email: "support@writeprof.com",
+    contactType: "customer support",
     availableLanguage: "English",
+    contactOption: "TollFree",
+  },
+  offers: {
+    "@type": "AggregateOffer",
+    lowPrice: "15",
+    highPrice: "75",
+    priceCurrency: "USD",
+    offerCount: "5",
+    description: "Rush writing orders from $15/page (24hr) to $75/page (1hr)",
   },
 };
 
@@ -99,9 +114,10 @@ const websiteSchema = {
   "@type": "WebSite",
   name: "WriteProf",
   url: "https://writeprof.com",
+  description: "Emergency writing marketplace for rush orders with 1–24 hour deadlines.",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://writeprof.com/search?q={search_term_string}",
+    target: "https://writeprof.com/blog?q={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };

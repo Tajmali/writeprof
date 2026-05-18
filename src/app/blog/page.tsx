@@ -7,7 +7,16 @@ import { Clock, ArrowRight, BookOpen, TrendingUp } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Blog — Writing Tips, Deadlines & Productivity",
-  description: "Expert tips on academic writing, meeting deadlines, productivity, and professional writing from the WriteProf team.",
+  description: "Expert tips on academic writing, meeting tight deadlines, productivity hacks, and professional writing strategies from the WriteProf team.",
+  alternates: { canonical: "https://writeprof.com/blog" },
+  keywords: ["writing tips", "academic writing", "deadline productivity", "essay writing guide", "professional writing blog"],
+  openGraph: {
+    title: "WriteProf Blog — Writing Tips, Deadlines & Productivity",
+    description: "Expert advice on academic writing, beating deadlines, and professional writing from the WriteProf team.",
+    url: "https://writeprof.com/blog",
+    type: "website",
+    images: [{ url: "https://writeprof.com/og-image.png", width: 1200, height: 630, alt: "WriteProf Blog" }],
+  },
 };
 
 const categoryColors: Record<string, string> = {

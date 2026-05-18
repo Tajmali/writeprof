@@ -15,13 +15,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!post) return { title: "Post Not Found | WriteProf" };
 
+  const url = `https://writeprof.com/blog/${post.slug}`;
+  const ogImage = post.coverImage || "https://writeprof.com/og-image.png";
+
   return {
-    title: `${post.title} | WriteProf Blog`,
+    title: post.title,
     description: post.excerpt || post.title,
+    alternates: { canonical: url },
+    keywords: post.tags?.length ? post.tags : undefined,
+    authors: [{ name: post.author || "WriteProf Team" }],
     openGraph: {
       title: post.title,
       description: post.excerpt || "",
-      images: post.coverImage ? [{ url: post.coverImage }] : [],
+      url,
+      type: "article",
+      publishedTime: post.createdAt.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+      authors: [post.author || "WriteProf Team"],
+      section: post.category || "Writing",
+      tags: post.tags || [],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: post.title }],
     },
   };
 }
@@ -45,8 +58,39 @@ export default async function BlogPostPage({ params }: Props) {
 
   const shareUrl = `https://writeprof.com/blog/${post.slug}`;
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt || post.title,
+    image: post.coverImage || "https://writeprof.com/og-image.png",
+    author: { "@type": "Person", name: post.author || "WriteProf Team" },
+    publisher: {
+      "@type": "Organization",
+      name: "WriteProf",
+      logo: { "@type": "ImageObject", url: "https://writeprof.com/logo.png" },
+    },
+    datePublished: post.createdAt.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    mainEntityOfPage: { "@type": "WebPage", "@id": shareUrl },
+    keywords: post.tags?.join(", ") || "",
+    articleSection: post.category || "Writing",
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://writeprof.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://writeprof.com/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: shareUrl },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0f1e]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Nav */}
       <nav className="sticky top-0 z-40 border-b border-white/10 backdrop-blur-xl bg-[#0a0f1e]/80">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
