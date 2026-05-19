@@ -24,7 +24,7 @@ export async function verifyToken(token: string): Promise<{ userId: string; emai
 
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get("wp_token")?.value;
     if (!token) return null;
 
@@ -57,8 +57,9 @@ export function comparePassword(password: string, hash: string): boolean {
   return hashPassword(password) === hash;
 }
 
-export function setAuthCookie(token: string) {
-  cookies().set("wp_token", token, {
+export async function setAuthCookie(token: string) {
+  const cookieStore = await cookies();
+  cookieStore.set("wp_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -67,8 +68,9 @@ export function setAuthCookie(token: string) {
   });
 }
 
-export function clearAuthCookie() {
-  cookies().delete("wp_token");
+export async function clearAuthCookie() {
+  const cookieStore = await cookies();
+  cookieStore.delete("wp_token");
 }
 
 export function generateOTP(): string {
