@@ -18,6 +18,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   let blogPages: MetadataRoute.Sitemap = [];
+  let samplePages: MetadataRoute.Sitemap = [];
+
   try {
     const posts = await prisma.blogPost.findMany({
       where: { isPublished: true },
@@ -29,9 +31,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     }));
+
+    const samples = await prisma.sampleOrder.findMany({
+      where: { isPublished: true },
+      select: { slug: true, updatedAt: true },
+    });
+    samplePages = [
+      { url: `${baseUrl}/samples`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.9 },
+      ...samples.map((s) => ({
+        url: `${baseUrl}/samples/${s.slug}`,
+        lastModified: s.updatedAt,
+        changeFrequency: "monthly" as const,
+        priority: 0.85,
+      })),
+    ];
   } catch {
-    // DB unavailable during build — skip blog pages
+    // DB unavailable during build — skip dynamic pages
   }
 
-  return [...staticPages, ...blogPages];
+  return [...staticPages, ...blogPages, ...samplePages];
 }

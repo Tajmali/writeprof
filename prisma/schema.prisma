@@ -358,6 +358,41 @@ model BlogPost {
   @@map("blog_posts")
 }
 
+model SampleOrder {
+  id             String            @id @default(cuid())
+  slug           String            @unique
+  title          String
+  subject        String
+  orderType      String
+  educationLevel String
+  citationStyle  String?
+  pages          Int               @default(1)
+  wordCount      Int               @default(275)
+  sources        Int?
+  language       String            @default("English (US)")
+  description    String            @db.Text
+  tags           String[]
+  isPublished    Boolean           @default(false)
+  views          Int               @default(0)
+  attachments    SampleOrderFile[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@map("sample_orders")
+}
+
+model SampleOrderFile {
+  id            String      @id @default(cuid())
+  sampleOrderId String
+  sampleOrder   SampleOrder @relation(fields: [sampleOrderId], references: [id], onDelete: Cascade)
+  name          String
+  url           String
+  mimeType      String      @default("application/pdf")
+  uploadedAt    DateTime    @default(now())
+
+  @@map("sample_order_files")
+}
+
 model PromoCode {
   id          String   @id @default(cuid())
   code        String   @unique

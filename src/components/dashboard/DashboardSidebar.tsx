@@ -41,6 +41,7 @@ const adminNavItems = [
   { icon: CreditCard, label: "Payments", href: "/admin/payments" },
   { icon: Shield, label: "Disputes", href: "/admin/disputes" },
   { icon: BookOpen, label: "Blog", href: "/admin/blog" },
+  { icon: FileText, label: "Samples", href: "/admin/samples" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 

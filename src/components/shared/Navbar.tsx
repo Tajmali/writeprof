@@ -18,6 +18,7 @@ const navLinks = [
     href: "#",
     children: [
       { label: "Blog",     href: "/blog" },
+      { label: "Samples",  href: "/samples" },
       { label: "FAQ",      href: "/#faq", sectionId: "faq" },
       { label: "About Us", href: "/about" },
     ],
