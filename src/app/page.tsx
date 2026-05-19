@@ -16,7 +16,7 @@ import { CTABanner } from "@/components/homepage/CTABanner";
 export const metadata: Metadata = {
   title: "WriteProf — Emergency Writing Marketplace | Get It Done in 1–24 Hours",
   description:
-    "Missed a deadline? WriteProf connects you with vetted professional writers who deliver essays, research papers, and copywriting in 1, 3, 6, 12, or 24 hours. Rush orders start at $15/page.",
+    "Missed a deadline? Get essays, research papers & copywriting done by vetted writers in 1–24 hours. Emergency writing marketplace. Rush orders from $15/page.",
   alternates: { canonical: "https://writeprof.com" },
   keywords: [
     "emergency writing service",

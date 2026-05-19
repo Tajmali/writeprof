@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | WriteProf",
   },
   description:
-    "Submit urgent writing tasks and get them completed by professional writers within 1–24 hours. Essays, research papers, copywriting, and more. Emergency delivery available.",
+    "Submit urgent writing tasks to vetted professionals. Essays, research papers, copywriting & more — delivered in 1–24 hours. Emergency writing marketplace.",
   keywords: [
     "emergency writing service",
     "urgent essay writing",
