@@ -94,9 +94,11 @@ model User {
   updatedAt     DateTime @updatedAt
 
   // Auth
-  passwordHash  String?
-  googleId      String?  @unique
-  sessions      Session[]
+  passwordHash             String?
+  googleId                 String?   @unique
+  emailVerificationToken   String?   @unique
+  emailVerificationExpires DateTime?
+  sessions                 Session[]
 
   // Client-specific
   clientOrders  Order[]  @relation("ClientOrders")

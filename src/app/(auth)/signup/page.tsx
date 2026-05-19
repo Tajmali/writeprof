@@ -40,6 +40,8 @@ function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -65,17 +67,52 @@ function SignupForm() {
 
       if (!res.ok) throw new Error(result.error || "Signup failed");
 
-      setUser(result.data.user);
-      toast.success("Account created! Welcome to WriteProf.");
-
-      if (data.role === "WRITER") router.push("/writer-dashboard");
-      else router.push("/dashboard");
+      // Show email verification screen instead of logging in
+      setRegisteredEmail(data.email);
+      setVerificationSent(true);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Signup failed");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show "check your email" screen after successful signup
+  if (verificationSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-16">
+        <div className="fixed inset-0 -z-10">
+          <div className="absolute inset-0 bg-[#020817]" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl" />
+        </div>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-md text-center">
+          <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-white">Write<span className="gradient-text">Prof</span></span>
+          </Link>
+          <div className="glass-card p-10">
+            <div className="w-16 h-16 rounded-full bg-brand-500/20 flex items-center justify-center mx-auto mb-5">
+              <Mail className="w-8 h-8 text-brand-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-3">Check your inbox</h1>
+            <p className="text-slate-400 text-sm leading-relaxed mb-6">
+              We sent a verification link to <strong className="text-white">{registeredEmail}</strong>. Click the link in that email to activate your account.
+            </p>
+            <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl p-4 mb-6 text-left">
+              <p className="text-brand-300 text-xs font-semibold mb-1">📬 Can't find it?</p>
+              <p className="text-slate-400 text-xs leading-relaxed">Check your spam/junk folder. The link expires in 24 hours.</p>
+            </div>
+            <p className="text-slate-500 text-xs">
+              Already verified?{" "}
+              <Link href="/login" className="text-brand-400 hover:underline">Sign in</Link>
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16">

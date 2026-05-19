@@ -409,4 +409,51 @@ export const emailTemplates = {
       </div>
     `,
   }),
+
+  verifyEmail: (name: string, verifyUrl: string) => ({
+    subject: "✅ Verify your WriteProf account",
+    html: `
+      <div style="font-family: Inter, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; border-radius: 16px; overflow: hidden;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #0c1445 0%, #0369a1 100%); padding: 44px 32px; text-align: center;">
+          <div style="display: inline-block; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 18px; margin-bottom: 20px;">
+            <span style="color: white; font-size: 20px; font-weight: 900; letter-spacing: -0.5px;">Write<span style="color: #7dd3fc;">Prof</span></span>
+          </div>
+          <div style="font-size: 48px; margin-bottom: 12px;">✉️</div>
+          <h1 style="color: white; font-size: 26px; font-weight: 800; margin: 0 0 8px;">Confirm your email, ${name}</h1>
+          <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 15px;">One click and you're ready to go</p>
+        </div>
+
+        <!-- Body -->
+        <div style="padding: 40px 32px;">
+          <p style="color: #94a3b8; font-size: 15px; line-height: 1.8; margin: 0 0 32px;">
+            Thanks for signing up! Before you can place orders or start earning, we need to verify that this email address belongs to you. Click the button below — it only takes a second.
+          </p>
+
+          <!-- CTA -->
+          <div style="text-align: center; margin-bottom: 32px;">
+            <a href="${verifyUrl}"
+               style="display: inline-block; background: linear-gradient(135deg, #0ea5e9, #0369a1); color: white; padding: 16px 40px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: 0.3px;">
+              ✅ Verify My Email
+            </a>
+          </div>
+
+          <!-- Fallback link -->
+          <div style="background: #1e293b; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;">
+            <p style="color: #64748b; font-size: 12px; margin: 0 0 6px;">Or copy and paste this link into your browser:</p>
+            <p style="color: #38bdf8; font-size: 12px; word-break: break-all; margin: 0;">${verifyUrl}</p>
+          </div>
+
+          <p style="color: #475569; font-size: 13px; line-height: 1.7; margin: 0;">
+            This link expires in <strong style="color: #94a3b8;">24 hours</strong>. If you didn't create a WriteProf account, you can safely ignore this email.
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 20px 32px; border-top: 1px solid rgba(255,255,255,0.07); text-align: center;">
+          <p style="color: #334155; font-size: 12px; margin: 0;">© ${new Date().getFullYear()} WriteProf · Emergency Writing Marketplace</p>
+        </div>
+      </div>
+    `,
+  }),
 };

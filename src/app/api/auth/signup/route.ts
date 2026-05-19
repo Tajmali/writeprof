@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { signToken, hashPassword, generateReferralCode } from "@/lib/auth";
+import { hashPassword, generateReferralCode } from "@/lib/auth";
 import { sendEmail, emailTemplates } from "@/lib/email";
 
 const signupSchema = z.object({
@@ -27,6 +28,10 @@ export async function POST(req: NextRequest) {
     const passwordHash = hashPassword(data.password);
     const referralCode = generateReferralCode(data.name);
 
+    // Generate email verification token (expires in 24 hours)
+    const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+    const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     // Find referrer
     let referredById: string | undefined;
     if (data.referredBy) {
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
       if (referrer) referredById = referrer.id;
     }
 
-    // Create user with wallet
+    // Create user — NOT verified yet
     const user = await prisma.user.create({
       data: {
         name: data.name,
@@ -44,6 +49,9 @@ export async function POST(req: NextRequest) {
         passwordHash,
         referralCode,
         referredBy: referredById,
+        emailVerified: false,
+        emailVerificationToken,
+        emailVerificationExpires,
         wallet: { create: { balance: 0, totalEarned: 0, totalSpent: 0 } },
         ...(data.role === "WRITER"
           ? {
@@ -61,22 +69,12 @@ export async function POST(req: NextRequest) {
       include: { writerProfile: true, wallet: true },
     });
 
-    const token = await signToken({ userId: user.id, email: user.email, role: user.role });
-
-    await prisma.session.create({
-      data: {
-        userId: user.id,
-        token,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
-
-    // Send role-specific welcome email to new user (non-blocking)
-    const tmpl = user.role === "WRITER"
-      ? emailTemplates.welcomeWriter(user.name)
-      : emailTemplates.welcomeClient(user.name);
-    sendEmail({ to: user.email, subject: tmpl.subject, html: tmpl.html })
-      .catch((err) => console.error("Welcome email failed:", err?.message));
+    // Send verification email
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://writeprof.com";
+    const verifyUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
+    const verifyTmpl = emailTemplates.verifyEmail(user.name, verifyUrl);
+    sendEmail({ to: user.email, subject: verifyTmpl.subject, html: verifyTmpl.html })
+      .catch((err) => console.error("Verification email failed:", err?.message));
 
     // Notify admin of new signup (non-blocking)
     const adminTmpl = emailTemplates.adminNewSignup(user.name, user.email, user.role);
@@ -86,33 +84,17 @@ export async function POST(req: NextRequest) {
       html: adminTmpl.html,
     }).catch((err) => console.error("Admin signup email failed:", err?.message));
 
-    const response = NextResponse.json({
+    // Do NOT set auth cookie or return token — user must verify email first
+    return NextResponse.json({
       success: true,
+      requiresVerification: true,
+      message: "Account created! Please check your email to verify your account before logging in.",
       data: {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          emailVerified: user.emailVerified,
-          isActive: user.isActive,
-          writerProfile: user.writerProfile,
-          wallet: user.wallet,
-          createdAt: user.createdAt,
-        },
-        token,
+        email: user.email,
+        name: user.name,
+        role: user.role,
       },
     });
-
-    response.cookies.set("wp_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
-    return response;
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ success: false, error: err.errors[0].message }, { status: 400 });

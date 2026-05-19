@@ -35,6 +35,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Account is inactive." }, { status: 403 });
     }
 
+    if (!user.emailVerified) {
+      return NextResponse.json({
+        success: false,
+        error: "Please verify your email before logging in. Check your inbox for the verification link.",
+        requiresVerification: true,
+        email: user.email,
+      }, { status: 403 });
+    }
+
     const token = await signToken({ userId: user.id, email: user.email, role: user.role });
 
     // Store session

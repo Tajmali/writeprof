@@ -23,6 +23,9 @@ export default function LoginPage() {
   const { setUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSent, setResendSent] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -38,7 +41,13 @@ export default function LoginPage() {
       });
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.error || "Login failed");
+      if (!res.ok) {
+        if (result.requiresVerification) {
+          setUnverifiedEmail(result.email || data.email);
+          throw new Error(result.error);
+        }
+        throw new Error(result.error || "Login failed");
+      }
 
       setUser(result.data.user);
       toast.success("Welcome back!");
@@ -56,6 +65,21 @@ export default function LoginPage() {
 
   const handleGoogleLogin = () => {
     window.location.href = "/api/auth/google";
+  };
+
+  const handleResendVerification = async () => {
+    if (!unverifiedEmail) return;
+    setResendLoading(true);
+    try {
+      await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: unverifiedEmail }),
+      });
+      setResendSent(true);
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   return (
@@ -88,6 +112,27 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
             <p className="text-slate-400 text-sm">Sign in to your WriteProf account</p>
           </div>
+
+          {/* Unverified email banner */}
+          {unverifiedEmail && (
+            <div className="mb-5 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+              <p className="text-yellow-300 text-sm font-semibold mb-1">📧 Email not verified</p>
+              <p className="text-slate-400 text-xs mb-3">
+                Check your inbox for the verification link, or get a new one below.
+              </p>
+              {resendSent ? (
+                <p className="text-green-400 text-xs font-medium">✅ New link sent! Check your inbox.</p>
+              ) : (
+                <button
+                  onClick={handleResendVerification}
+                  disabled={resendLoading}
+                  className="text-xs text-brand-400 hover:text-brand-300 font-semibold underline"
+                >
+                  {resendLoading ? "Sending…" : "Resend verification email →"}
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Google Sign In */}
           <button
