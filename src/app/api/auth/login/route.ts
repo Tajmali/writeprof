@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { signToken, comparePassword, setAuthCookie } from "@/lib/auth";
-import { sendEmail, emailTemplates } from "@/lib/email";
+import { signToken, comparePassword, hashPassword } from "@/lib/auth";
+import { rateLimiter } from "@/lib/rate-limit";
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(1),
 });
 
 export async function POST(req: NextRequest) {
+  // Rate limiting: 8 attempts per IP per 15 minutes
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const rl = rateLimiter.check(`login:${ip}`, 8, 15 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, error: `Too many login attempts. Try again in ${Math.ceil(rl.retryAfterSeconds!)}s.` },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    );
+  }
+
   try {
     const body = await req.json();
     const { email, password } = loginSchema.parse(body);
@@ -23,7 +33,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Invalid email or password" }, { status: 401 });
     }
 
-    if (!comparePassword(password, user.passwordHash)) {
+    const { matched, isLegacy } = await comparePassword(password, user.passwordHash);
+
+    if (!matched) {
       return NextResponse.json({ success: false, error: "Invalid email or password" }, { status: 401 });
     }
 
@@ -44,6 +56,15 @@ export async function POST(req: NextRequest) {
       }, { status: 403 });
     }
 
+    // ── Silently upgrade legacy SHA-256 hash to bcrypt ──────────────────────
+    if (isLegacy) {
+      const newHash = await hashPassword(password);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash: newHash },
+      }).catch(() => { /* non-fatal */ });
+    }
+
     const token = await signToken({ userId: user.id, email: user.email, role: user.role });
 
     // Store session
@@ -54,6 +75,9 @@ export async function POST(req: NextRequest) {
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });
+
+    // Clear rate-limit counter on successful login
+    rateLimiter.reset(`login:${ip}`);
 
     const response = NextResponse.json({
       success: true,

@@ -3,10 +3,20 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import * as crypto from "crypto";
+import { rateLimiter } from "@/lib/rate-limit";
 
 const schema = z.object({ email: z.string().email() });
 
 export async function POST(req: NextRequest) {
+  // 3 password-reset requests per IP per hour
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const rl = rateLimiter.check(`forgot-pw:${ip}`, 3, 60 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: true, message: "If this email exists, you'll receive a reset link." }
+    ); // Return success so we don't reveal the rate limit
+  }
+
   try {
     const body = await req.json();
     const { email } = schema.parse(body);

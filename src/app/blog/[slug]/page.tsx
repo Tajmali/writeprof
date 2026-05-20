@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowLeft, Clock, User, Calendar, Tag, Share2, BookOpen } from "lucide-react";
+import sanitizeHtml from "sanitize-html";
 
 interface Props {
   params: { slug: string };
@@ -242,9 +243,26 @@ export default async function BlogPostPage({ params }: Props) {
   );
 }
 
+const ALLOWED_TAGS = [
+  "h1", "h2", "h3", "h4", "h5", "h6",
+  "p", "br", "hr",
+  "ul", "ol", "li",
+  "blockquote", "pre", "code",
+  "strong", "em", "b", "i", "u", "s",
+  "a", "img",
+  "table", "thead", "tbody", "tr", "th", "td",
+  "div", "span",
+];
+
+const ALLOWED_ATTRS: sanitizeHtml.IOptions["allowedAttributes"] = {
+  a: ["href", "rel", "target"],
+  img: ["src", "alt", "width", "height"],
+  "*": ["class"],
+};
+
 function formatContent(content: string): string {
-  // Simple markdown-like conversion for stored content
-  return content
+  // Convert simple markdown-like syntax to HTML
+  const raw = content
     .replace(/^# (.+)$/gm, "<h1>$1</h1>")
     .replace(/^## (.+)$/gm, "<h2>$1</h2>")
     .replace(/^### (.+)$/gm, "<h3>$1</h3>")
@@ -252,7 +270,23 @@ function formatContent(content: string): string {
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .replace(/`(.+?)`/g, "<code>$1</code>")
     .replace(/\n\n/g, "</p><p>")
-    .replace(/^/gm, "")
-    .replace(/^<p>/, "<p>")
     || `<p>${content}</p>`;
+
+  // Strip any XSS payloads — allow only safe formatting tags
+  return sanitizeHtml(raw, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTRS,
+    allowedSchemes: ["https", "http", "mailto"],
+    // Force external links to open safely
+    transformTags: {
+      a: (tagName, attribs) => ({
+        tagName,
+        attribs: {
+          ...attribs,
+          rel: "noopener noreferrer",
+          target: attribs.href?.startsWith("/") ? "_self" : "_blank",
+        },
+      }),
+    },
+  });
 }

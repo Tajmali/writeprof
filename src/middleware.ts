@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "writeprof-secret-key-change-in-production"
-);
+function getJwtSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("JWT_SECRET environment variable is required in production.");
+    }
+    return new TextEncoder().encode("writeprof-dev-fallback-not-for-production");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 const PUBLIC_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/blog", "/about", "/contact", "/terms", "/privacy", "/refund"];
 const API_PUBLIC_ROUTES = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/google"];
@@ -39,7 +46,7 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     const role = payload.role as string;
 
     // Role-based access control

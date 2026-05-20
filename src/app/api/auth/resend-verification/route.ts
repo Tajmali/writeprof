@@ -2,8 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { rateLimiter } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  // 3 resend attempts per IP per hour
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const rl = rateLimiter.check(`resend-verify:${ip}`, 3, 60 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, error: "Too many requests. Please wait before requesting another email." },
+      { status: 429 }
+    );
+  }
+
   try {
     const { email } = await req.json();
 

@@ -4,17 +4,28 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, generateReferralCode } from "@/lib/auth";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { rateLimiter } from "@/lib/rate-limit";
 
 const signupSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().optional(),
-  password: z.string().min(8),
+  name: z.string().min(2).max(100),
+  email: z.string().email().max(255),
+  phone: z.string().max(20).optional(),
+  password: z.string().min(8).max(128),
   role: z.enum(["CLIENT", "WRITER"]),
-  referredBy: z.string().optional(),
+  referredBy: z.string().max(20).optional(),
 });
 
 export async function POST(req: NextRequest) {
+  // Rate limiting: 5 sign-ups per IP per hour
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const rl = rateLimiter.check(`signup:${ip}`, 5, 60 * 60 * 1000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, error: `Too many sign-up attempts. Try again in ${Math.ceil(rl.retryAfterSeconds!)} seconds.` },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await req.json();
     const data = signupSchema.parse(body);
@@ -25,7 +36,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Email already registered" }, { status: 400 });
     }
 
-    const passwordHash = hashPassword(data.password);
+    // bcrypt hash (async, cost 12)
+    const passwordHash = await hashPassword(data.password);
     const referralCode = generateReferralCode(data.name);
 
     // Generate email verification token (expires in 24 hours)
@@ -69,14 +81,14 @@ export async function POST(req: NextRequest) {
       include: { writerProfile: true, wallet: true },
     });
 
-    // Send verification email
+    // Send verification email (non-blocking)
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://writeprof.com";
     const verifyUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
     const verifyTmpl = emailTemplates.verifyEmail(user.name, verifyUrl);
     sendEmail({ to: user.email, subject: verifyTmpl.subject, html: verifyTmpl.html })
       .catch((err) => console.error("Verification email failed:", err?.message));
 
-    // Notify admin of new signup (non-blocking)
+    // Notify admin (non-blocking)
     const adminTmpl = emailTemplates.adminNewSignup(user.name, user.email, user.role);
     sendEmail({
       to: process.env.ADMIN_EMAIL || "oriaventures@gmail.com",
@@ -84,16 +96,11 @@ export async function POST(req: NextRequest) {
       html: adminTmpl.html,
     }).catch((err) => console.error("Admin signup email failed:", err?.message));
 
-    // Do NOT set auth cookie or return token — user must verify email first
     return NextResponse.json({
       success: true,
       requiresVerification: true,
       message: "Account created! Please check your email to verify your account before logging in.",
-      data: {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
+      data: { email: user.email, name: user.name, role: user.role },
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
