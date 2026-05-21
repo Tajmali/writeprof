@@ -3,6 +3,50 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const token = req.cookies.get("wp_token")?.value;
+    if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
+    const payload = await verifyToken(token);
+    if (!payload || payload.role !== "ADMIN") return NextResponse.json({ success: false, error: "Admin access required" }, { status: 403 });
+
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+    if (!userId) return NextResponse.json({ success: false, error: "userId is required" }, { status: 400 });
+
+    // Safety: cannot delete yourself
+    if (userId === payload.userId) {
+      return NextResponse.json({ success: false, error: "You cannot delete your own account." }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { _count: { select: { clientOrders: true } } },
+    });
+    if (!user) return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
+
+    // Safety: cannot delete other admins
+    if (user.role === "ADMIN") {
+      return NextResponse.json({ success: false, error: "Admin accounts cannot be deleted." }, { status: 400 });
+    }
+
+    // If user has orders, block deletion to protect order history
+    if (user._count.clientOrders > 0) {
+      return NextResponse.json({
+        success: false,
+        error: `This user has ${user._count.clientOrders} order(s). Ban or deactivate their account instead to preserve order history.`,
+      }, { status: 400 });
+    }
+
+    await prisma.user.delete({ where: { id: userId } });
+
+    return NextResponse.json({ success: true, data: { message: `${user.name} has been permanently deleted.` } });
+  } catch (err) {
+    console.error("DELETE /api/admin/users error:", err);
+    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+  }
+}
+
 export async function GET(req: NextRequest) {
   try {
     const token = req.cookies.get("wp_token")?.value;

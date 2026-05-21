@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users, Search, Filter, Shield, Ban, CheckCircle, Eye,
-  Mail, Calendar, ShoppingBag, MoreVertical, Loader2, UserCheck, UserX
+  Mail, Calendar, ShoppingBag, MoreVertical, Loader2, UserCheck, UserX, Trash2, AlertTriangle
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -29,6 +29,7 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-users", page, search, roleFilter],
@@ -62,6 +63,24 @@ export default function AdminUsersPage() {
       setOpenMenu(null);
     },
     onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const res = await fetch(`/api/admin/users?userId=${userId}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error);
+      return json.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "User deleted");
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setDeleteTarget(null);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+      setDeleteTarget(null);
+    },
   });
 
   const users: User[] = data?.data?.users || [];
@@ -202,6 +221,17 @@ export default function AdminUsersPage() {
                               ) : (
                                 <ActionItem icon={Ban} label="Ban User" onClick={() => actionMutation.mutate({ userId: user.id, action: "ban" })} color="text-red-400" />
                               )}
+                              {user.role !== "ADMIN" && (
+                                <>
+                                  <div className="border-t border-white/10 my-1" />
+                                  <ActionItem
+                                    icon={Trash2}
+                                    label="Delete Profile"
+                                    onClick={() => { setDeleteTarget(user); setOpenMenu(null); }}
+                                    color="text-red-500"
+                                  />
+                                </>
+                              )}
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -229,6 +259,67 @@ export default function AdminUsersPage() {
           </div>
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={(e) => e.target === e.currentTarget && setDeleteTarget(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-slate-900 border border-red-500/30 rounded-2xl w-full max-w-md shadow-2xl p-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-5 h-5 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold">Delete Profile</h3>
+                  <p className="text-slate-400 text-sm">This action cannot be undone</p>
+                </div>
+              </div>
+
+              <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-5">
+                <p className="text-white font-semibold text-sm">{deleteTarget.name}</p>
+                <p className="text-slate-400 text-xs mt-0.5">{deleteTarget.email} · {deleteTarget.role}</p>
+              </div>
+
+              <p className="text-slate-400 text-sm mb-6">
+                Permanently deletes this account and all associated data (sessions, wallet, profile).
+                <strong className="text-white"> Users with existing orders cannot be deleted</strong> — ban or deactivate them instead.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  className="btn-secondary flex-1 py-2.5 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => deleteMutation.mutate(deleteTarget.id)}
+                  disabled={deleteMutation.isPending}
+                  className="flex-1 py-2.5 text-sm font-semibold rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {deleteMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  {deleteMutation.isPending ? "Deleting..." : "Yes, Delete"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
