@@ -81,14 +81,18 @@ export async function POST(req: NextRequest) {
       include: { writerProfile: true, wallet: true },
     });
 
-    // Send verification email (non-blocking)
+    // Send verification email — awaited so Vercel doesn't kill it before delivery
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://writeprof.com";
     const verifyUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
     const verifyTmpl = emailTemplates.verifyEmail(user.name, verifyUrl);
-    sendEmail({ to: user.email, subject: verifyTmpl.subject, html: verifyTmpl.html })
-      .catch((err) => console.error("Verification email failed:", err?.message));
+    try {
+      await sendEmail({ to: user.email, subject: verifyTmpl.subject, html: verifyTmpl.html });
+    } catch (emailErr: any) {
+      console.error("Verification email failed:", emailErr?.message);
+      // Don't block signup — user can resend via the login page
+    }
 
-    // Notify admin (non-blocking)
+    // Notify admin (non-blocking, non-critical)
     const adminTmpl = emailTemplates.adminNewSignup(user.name, user.email, user.role);
     sendEmail({
       to: process.env.ADMIN_EMAIL || "oriaventures@gmail.com",

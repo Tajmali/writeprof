@@ -45,8 +45,7 @@ export async function POST(req: NextRequest) {
     const verifyUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
     const tmpl = emailTemplates.verifyEmail(user.name, verifyUrl);
 
-    sendEmail({ to: user.email, subject: tmpl.subject, html: tmpl.html })
-      .catch((err) => console.error("Resend verification email failed:", err?.message));
+    await sendEmail({ to: user.email, subject: tmpl.subject, html: tmpl.html });
 
     return NextResponse.json({
       success: true,
