@@ -5,7 +5,7 @@ import { Resend } from "resend";
 // Add RESEND_API_KEY to your Vercel environment variables.
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_ADDRESS = "WriteProf <onboarding@resend.dev>";
+const FROM_ADDRESS = "WriteProf <noreply@writeprof.com>";
 const ADMIN_EMAIL  = process.env.ADMIN_EMAIL || "oriaventures@gmail.com";
 
 // ─── Core send helper ─────────────────────────────────────────────────────────

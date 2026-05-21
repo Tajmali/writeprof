@@ -17,7 +17,7 @@ export async function GET() {
   try {
     const resend = new Resend(apiKey);
     const { data, error } = await resend.emails.send({
-      from: "WriteProf <onboarding@resend.dev>",
+      from: "WriteProf <noreply@writeprof.com>",
       to: adminEmail,
       subject: "✅ WriteProf Email Test — Resend is working!",
       html: `<div style="font-family:sans-serif;padding:24px;background:#0f172a;color:#e2e8f0;border-radius:12px;">
