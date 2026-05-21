@@ -67,6 +67,13 @@ enum WriterStatus {
   OFFLINE
 }
 
+enum ProposalStatus {
+  OPEN
+  UNCONFIRMED
+  DECLINED
+  CANCELED
+}
+
 enum NotificationType {
   ORDER_ASSIGNED
   ORDER_SUBMITTED
@@ -157,9 +164,27 @@ model WriterProfile {
   joinedAt         DateTime     @default(now())
   lastActiveAt     DateTime     @default(now())
 
-  orders Order[] @relation("WriterOrders")
+  orders    Order[]    @relation("WriterOrders")
+  proposals Proposal[]
 
   @@map("writer_profiles")
+}
+
+model Proposal {
+  id          String         @id @default(cuid())
+  orderId     String
+  order       Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  writerId    String
+  writer      WriterProfile  @relation(fields: [writerId], references: [id], onDelete: Cascade)
+  coverLetter String         @db.Text
+  bidAmount   Float?
+  status      ProposalStatus @default(OPEN)
+  note        String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([orderId, writerId])
+  @@map("proposals")
 }
 
 model Order {
@@ -188,6 +213,9 @@ model Order {
   client        User         @relation("ClientOrders", fields: [clientId], references: [id])
   writerId      String?
   writer        WriterProfile? @relation("WriterOrders", fields: [writerId], references: [id])
+
+  // Proposals / bids
+  proposals     Proposal[]
 
   // Files
   attachments   OrderFile[]
