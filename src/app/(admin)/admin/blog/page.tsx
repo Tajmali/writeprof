@@ -208,7 +208,7 @@ export default function AdminBlogPage() {
                           const res = await fetch("/api/upload", { method: "POST", body: fd });
                           const json = await res.json();
                           if (!json.success) throw new Error(json.error);
-                          setForm(p => ({ ...p, coverImage: json.data.secure_url }));
+                          setForm(p => ({ ...p, coverImage: json.data.url }));
                           toast.success("Image uploaded!");
                         } catch (err: any) {
                           toast.error(err.message || "Upload failed");
