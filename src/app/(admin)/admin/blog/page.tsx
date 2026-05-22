@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, Plus, Search, Edit2, Trash2, Eye, EyeOff,
-  Loader2, Calendar, Clock, Tag, X, Save, ImagePlus, XCircle
+  Loader2, Calendar, Clock, Tag, X, Save, ImagePlus, XCircle, Maximize2
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -30,6 +30,7 @@ export default function AdminBlogPage() {
     title: "", excerpt: "", content: "", category: "", coverImage: "", readTime: 5,
   });
   const [imageUploading, setImageUploading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ["admin-blog", search],
@@ -266,6 +267,13 @@ export default function AdminBlogPage() {
                   <Save className="w-4 h-4" /> Save Draft
                 </button>
                 <button
+                  onClick={() => setShowPreview(true)}
+                  disabled={!form.title}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-white/20 text-gray-300 hover:bg-white/5 transition-all disabled:opacity-40"
+                >
+                  <Maximize2 className="w-4 h-4" /> Preview
+                </button>
+                <button
                   onClick={() => saveMutation.mutate({ ...form, id: editingPost?.id, isPublished: true })}
                   disabled={saveMutation.isPending || !form.title}
                   className="btn-primary flex-1 flex items-center justify-center gap-2"
@@ -358,5 +366,117 @@ export default function AdminBlogPage() {
         </div>
       )}
     </div>
+
+      {/* Preview Modal */}
+      <AnimatePresence>
+        {showPreview && (
+          <BlogPreviewModal form={form} onClose={() => setShowPreview(false)} />
+        )}
+      </AnimatePresence>
   );
+}
+
+// ─── Blog Preview Modal ───────────────────────────────────────────────────────
+function BlogPreviewModal({
+  form, onClose,
+}: {
+  form: { title: string; excerpt: string; content: string; category: string; coverImage: string; readTime: number };
+  onClose: () => void;
+}) {
+  const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-[#0a0f1e] overflow-y-auto"
+    >
+      {/* Preview toolbar */}
+      <div className="sticky top-0 z-10 border-b border-white/10 backdrop-blur-xl bg-[#0a0f1e]/90 px-4 py-3 flex items-center justify-between">
+        <span className="text-sm font-semibold text-brand-400 flex items-center gap-2">
+          <Maximize2 className="w-4 h-4" /> Preview — how readers will see this post
+        </span>
+        <button onClick={onClose} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/20 text-gray-300 hover:bg-white/5 text-sm transition-all">
+          <X className="w-4 h-4" /> Close Preview
+        </button>
+      </div>
+
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+        {form.category && (
+          <div className="mb-6">
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/20 text-brand-400 border border-brand-500/30">
+              {form.category}
+            </span>
+          </div>
+        )}
+
+        <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight mb-6">
+          {form.title || <span className="text-gray-600 italic">Untitled post</span>}
+        </h1>
+
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-8 pb-8 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-brand-500/20 flex items-center justify-center text-xs font-bold text-brand-400">W</div>
+            <span>WriteProf Team</span>
+          </div>
+          <div className="flex items-center gap-1"><Calendar className="w-4 h-4" /><span>{today}</span></div>
+          {form.readTime > 0 && (
+            <div className="flex items-center gap-1"><Clock className="w-4 h-4" /><span>{form.readTime} min read</span></div>
+          )}
+        </div>
+
+        {form.coverImage && (
+          <div className="mb-8 rounded-2xl overflow-hidden">
+            <img src={form.coverImage} alt={form.title} className="w-full h-64 sm:h-80 object-cover" />
+          </div>
+        )}
+
+        {form.excerpt && (
+          <p className="text-lg text-gray-300 leading-relaxed mb-8 font-medium italic border-l-2 border-brand-500 pl-4">
+            {form.excerpt}
+          </p>
+        )}
+
+        {form.content ? (
+          <div
+            className="prose prose-invert prose-lg max-w-none
+              prose-headings:text-white prose-headings:font-bold
+              prose-p:text-gray-300 prose-p:leading-relaxed
+              prose-a:text-brand-400 prose-strong:text-white
+              prose-code:text-brand-300 prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+              prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10
+              prose-blockquote:border-l-brand-500 prose-blockquote:text-gray-300
+              prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:text-gray-300"
+            dangerouslySetInnerHTML={{ __html: formatPreviewContent(form.content) }}
+          />
+        ) : (
+          <p className="text-gray-600 italic">No content written yet...</p>
+        )}
+      </article>
+
+      <div className="bg-gradient-to-r from-brand-600/20 to-brand-400/10 border-t border-brand-500/20 py-12">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-2xl font-bold text-white mb-3">Need Expert Writing Help?</h2>
+          <p className="text-gray-400">Get your assignment done in as little as 1 hour by professional writers.</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function formatPreviewContent(content: string): string {
+  return content
+    .replace(/^#### (.+)$/gm, "<h4>$1</h4>")
+    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/`(.+?)`/g, "<code>$1</code>")
+    .replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>")
+    .replace(/^- (.+)$/gm, "<li>$1</li>")
+    .replace(/\n\n/g, "</p><p>")
+    .replace(/^(?!<[a-z])(.+)$/gm, "<p>$1</p>")
+    .replace(/<p><\/p>/g, "");
 }
