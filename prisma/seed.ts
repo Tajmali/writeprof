@@ -11,37 +11,26 @@ function hashPassword(password: string): string {
 }
 
 async function main() {
-  console.log("🌱 Seeding WriteProf database...");
+  console.log("🌱 Seeding WriteProf database (safe mode — never deletes existing data)...");
 
-  // Clear existing data
-  await prisma.notification.deleteMany();
-  await prisma.message.deleteMany();
-  await prisma.submission.deleteMany();
-  await prisma.orderFile.deleteMany();
-  await prisma.payment.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.transaction.deleteMany();
-  await prisma.wallet.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.writerProfile.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.blogPost.deleteMany();
-  await prisma.promoCode.deleteMany();
-  await prisma.systemSetting.deleteMany();
-
-  // Create Admin
-  const admin = await prisma.user.create({
-    data: {
-      email: "admin@writeprof.com",
-      name: "WriteProf Admin",
-      role: "ADMIN",
-      emailVerified: true,
-      passwordHash: hashPassword("Admin@WriteProf2026"),
-      referralCode: "ADMIN001",
-      wallet: { create: { balance: 0, totalEarned: 0, totalSpent: 0 } },
-    },
-  });
-  console.log("✅ Admin created:", admin.email);
+  // Create Admin (only if doesn't exist)
+  const existingAdmin = await prisma.user.findUnique({ where: { email: "admin@writeprof.com" } });
+  if (!existingAdmin) {
+    const admin = await prisma.user.create({
+      data: {
+        email: "admin@writeprof.com",
+        name: "WriteProf Admin",
+        role: "ADMIN",
+        emailVerified: true,
+        passwordHash: hashPassword("Admin@WriteProf2026"),
+        referralCode: "ADMIN001",
+        wallet: { create: { balance: 0, totalEarned: 0, totalSpent: 0 } },
+      },
+    });
+    console.log("✅ Admin created:", admin.email);
+  } else {
+    console.log("⏭️  Admin already exists, skipping");
+  }
 
   // Create Writers
   const writerData = [
@@ -53,35 +42,40 @@ async function main() {
     { name: "Michael C.", email: "michael@writeprof.com", bio: "MBA graduate specializing in business writing, financial reports, and technical documentation.", specs: ["Business Writing", "Technical Writing", "Reports", "Proposals"], rating: 4.7, completed: 621 },
   ];
 
+  let writersCreated = 0;
   for (const wd of writerData) {
-    await prisma.user.create({
-      data: {
-        email: wd.email,
-        name: wd.name,
-        role: "WRITER",
-        emailVerified: true,
-        passwordHash: hashPassword("Writer@2026"),
-        referralCode: wd.name.replace(/\s+/g, "").toUpperCase().slice(0, 6),
-        wallet: { create: { balance: Math.floor(Math.random() * 50000) + 10000, totalEarned: wd.completed * 8000, totalSpent: 0 } },
-        writerProfile: {
-          create: {
-            bio: wd.bio,
-            specializations: wd.specs,
-            languages: ["English"],
-            status: Math.random() > 0.3 ? "AVAILABLE" : "BUSY",
-            isApproved: true,
-            isVerified: true,
-            rating: wd.rating,
-            totalOrders: wd.completed + Math.floor(Math.random() * 50),
-            completedOrders: wd.completed,
-            onTimeDelivery: 95 + Math.floor(Math.random() * 5),
-            performanceScore: 90 + Math.floor(Math.random() * 10),
+    const exists = await prisma.user.findUnique({ where: { email: wd.email } });
+    if (!exists) {
+      await prisma.user.create({
+        data: {
+          email: wd.email,
+          name: wd.name,
+          role: "WRITER",
+          emailVerified: true,
+          passwordHash: hashPassword("Writer@2026"),
+          referralCode: wd.name.replace(/\s+/g, "").toUpperCase().slice(0, 6),
+          wallet: { create: { balance: Math.floor(Math.random() * 50000) + 10000, totalEarned: wd.completed * 8000, totalSpent: 0 } },
+          writerProfile: {
+            create: {
+              bio: wd.bio,
+              specializations: wd.specs,
+              languages: ["English"],
+              status: "AVAILABLE",
+              isApproved: true,
+              isVerified: true,
+              rating: wd.rating,
+              totalOrders: wd.completed,
+              completedOrders: wd.completed,
+              onTimeDelivery: 97,
+              performanceScore: 95,
+            },
           },
         },
-      },
-    });
+      });
+      writersCreated++;
+    }
   }
-  console.log("✅ Writers created:", writerData.length);
+  console.log(`✅ Writers: ${writersCreated} created, ${writerData.length - writersCreated} already existed`);
 
   // Create sample clients
   const clientData = [
@@ -92,89 +86,60 @@ async function main() {
     { name: "Dr. Emeka Nwosu", email: "emeka@example.com" },
   ];
 
-  const clients = [];
+  let clientsCreated = 0;
   for (const cd of clientData) {
-    const client = await prisma.user.create({
-      data: {
-        email: cd.email,
-        name: cd.name,
-        role: "CLIENT",
-        emailVerified: true,
-        passwordHash: hashPassword("Client@2026"),
-        referralCode: cd.name.replace(/\s+/g, "").toUpperCase().slice(0, 6),
-        wallet: { create: { balance: Math.floor(Math.random() * 20000), totalEarned: 0, totalSpent: Math.floor(Math.random() * 100000) + 10000 } },
-      },
-    });
-    clients.push(client);
+    const exists = await prisma.user.findUnique({ where: { email: cd.email } });
+    if (!exists) {
+      await prisma.user.create({
+        data: {
+          email: cd.email,
+          name: cd.name,
+          role: "CLIENT",
+          emailVerified: true,
+          passwordHash: hashPassword("Client@2026"),
+          referralCode: cd.name.replace(/\s+/g, "").toUpperCase().slice(0, 6),
+          wallet: { create: { balance: 0, totalEarned: 0, totalSpent: 0 } },
+        },
+      });
+      clientsCreated++;
+    }
   }
-  console.log("✅ Clients created:", clients.length);
+  console.log(`✅ Clients: ${clientsCreated} created, ${clientData.length - clientsCreated} already existed`);
 
-  // Create sample blog posts
-  const blogPosts = [
-    {
-      slug: "how-to-write-essay-in-2-hours",
-      title: "How to Write a Compelling Essay in Under 2 Hours",
-      excerpt: "When time is running out, you need a system. Here's the exact framework our top writers use to produce high-quality essays in hours, not days.",
-      content: "Full article content here...",
-      category: "Urgent Writing Help",
-      tags: ["Essay Writing", "Speed Writing", "Academic"],
-      author: "Dr. Sarah K.",
-      readTime: 7,
-      isPublished: true,
-      views: 12400,
-    },
-    {
-      slug: "apa-mla-citation-guide-2026",
-      title: "APA vs MLA vs Chicago: The Complete Citation Guide for 2026",
-      excerpt: "Getting citations wrong can cost you marks or credibility. This complete guide covers every citation style with examples.",
-      content: "Full article content here...",
-      category: "Academic Tips",
-      tags: ["APA", "MLA", "Citations"],
-      author: "Prof. Amara",
-      readTime: 12,
-      isPublished: true,
-      views: 24500,
-    },
-    {
-      slug: "copywriting-that-converts",
-      title: "7 Copywriting Formulas That Convert Like Crazy in 2026",
-      excerpt: "Great copy doesn't happen by accident. These battle-tested copywriting frameworks have generated millions in revenue.",
-      content: "Full article content here...",
-      category: "Copywriting",
-      tags: ["Copywriting", "Marketing", "Conversion"],
-      author: "James O.",
-      readTime: 10,
-      isPublished: true,
-      views: 15200,
-    },
+  // ⚠️ Blog posts are managed through the admin panel — NOT seeded here.
+  // Deleting a post in the admin panel will permanently delete it.
+
+  // Promo codes — only create if they don't exist
+  const promoCodes = [
+    { code: "WELCOME20", discount: 20, isPercent: true, maxUses: 1000, isActive: true },
+    { code: "EMERGENCY50", discount: 50, isPercent: false, maxUses: 100, isActive: true },
+    { code: "STUDENT10", discount: 10, isPercent: true, maxUses: 500, isActive: true },
   ];
-
-  for (const post of blogPosts) {
-    await prisma.blogPost.create({ data: post });
+  for (const promo of promoCodes) {
+    await prisma.promoCode.upsert({
+      where: { code: promo.code },
+      update: {},
+      create: promo,
+    });
   }
-  console.log("✅ Blog posts created:", blogPosts.length);
+  console.log("✅ Promo codes upserted");
 
-  // Promo codes
-  await prisma.promoCode.createMany({
-    data: [
-      { code: "WELCOME20", discount: 20, isPercent: true, maxUses: 1000, isActive: true },
-      { code: "EMERGENCY50", discount: 50, isPercent: false, maxUses: 100, isActive: true },
-      { code: "STUDENT10", discount: 10, isPercent: true, maxUses: 500, isActive: true },
-    ],
-  });
-  console.log("✅ Promo codes created");
-
-  // System settings
-  await prisma.systemSetting.createMany({
-    data: [
-      { key: "platform_commission", value: "20" },
-      { key: "emergency_fee", value: "5000" },
-      { key: "min_withdrawal", value: "5000" },
-      { key: "maintenance_mode", value: "false" },
-      { key: "max_active_orders_per_writer", value: "5" },
-    ],
-  });
-  console.log("✅ System settings created");
+  // System settings — only create if they don't exist
+  const settings = [
+    { key: "platform_commission", value: "20" },
+    { key: "emergency_fee", value: "5000" },
+    { key: "min_withdrawal", value: "5000" },
+    { key: "maintenance_mode", value: "false" },
+    { key: "max_active_orders_per_writer", value: "5" },
+  ];
+  for (const setting of settings) {
+    await prisma.systemSetting.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: setting,
+    });
+  }
+  console.log("✅ System settings upserted");
 
   console.log("\n🎉 Database seeded successfully!");
   console.log("\nLogin credentials:");
