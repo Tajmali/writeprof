@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, Plus, Search, Edit2, Trash2, Eye, EyeOff,
-  Loader2, Calendar, Clock, Tag, X, Save
+  Loader2, Calendar, Clock, Tag, X, Save, ImagePlus, XCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -29,6 +29,7 @@ export default function AdminBlogPage() {
   const [form, setForm] = useState({
     title: "", excerpt: "", content: "", category: "", coverImage: "", readTime: 5,
   });
+  const [imageUploading, setImageUploading] = useState(false);
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ["admin-blog", search],
@@ -154,12 +155,73 @@ export default function AdminBlogPage() {
               </button>
             </div>
             <div className="space-y-4">
+              {/* Title */}
               <input
                 value={form.title}
                 onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
                 placeholder="Post title..."
                 className="input-field w-full text-lg font-semibold"
               />
+
+              {/* Cover image uploader — sits between title and content */}
+              <div>
+                <p className="text-xs text-gray-400 mb-2">Cover Image</p>
+                {form.coverImage ? (
+                  <div className="relative group">
+                    <img
+                      src={form.coverImage}
+                      alt="Cover"
+                      className="w-full h-52 object-cover rounded-xl border border-white/10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setForm(p => ({ ...p, coverImage: "" }))}
+                      className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <XCircle className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-brand-500/50 hover:bg-white/3 transition-all">
+                    {imageUploading ? (
+                      <Loader2 className="w-8 h-8 text-brand-400 animate-spin" />
+                    ) : (
+                      <>
+                        <ImagePlus className="w-8 h-8 text-gray-500 mb-2" />
+                        <span className="text-sm text-gray-400">Click to upload cover image</span>
+                        <span className="text-xs text-gray-600 mt-1">JPG, PNG, WebP — max 5MB</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={imageUploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+                        setImageUploading(true);
+                        try {
+                          const fd = new FormData();
+                          fd.append("file", file);
+                          const res = await fetch("/api/upload", { method: "POST", body: fd });
+                          const json = await res.json();
+                          if (!json.success) throw new Error(json.error);
+                          setForm(p => ({ ...p, coverImage: json.data.secure_url }));
+                          toast.success("Image uploaded!");
+                        } catch (err: any) {
+                          toast.error(err.message || "Upload failed");
+                        } finally {
+                          setImageUploading(false);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={form.category}
@@ -181,12 +243,6 @@ export default function AdminBlogPage() {
                   />
                 </div>
               </div>
-              <input
-                value={form.coverImage}
-                onChange={e => setForm(p => ({ ...p, coverImage: e.target.value }))}
-                placeholder="Cover image URL..."
-                className="input-field w-full"
-              />
               <textarea
                 value={form.excerpt}
                 onChange={e => setForm(p => ({ ...p, excerpt: e.target.value }))}
