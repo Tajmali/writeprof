@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+
+// Always fetch fresh data — ensures deleted/updated posts reflect immediately
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 import { ArrowLeft, Clock, User, Calendar, Tag, Share2, BookOpen } from "lucide-react";
 import sanitizeHtml from "sanitize-html";
 

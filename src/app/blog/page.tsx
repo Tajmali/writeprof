@@ -5,6 +5,10 @@ import { Footer } from "@/components/shared/Footer";
 import Link from "next/link";
 import { Clock, ArrowRight, BookOpen, TrendingUp } from "lucide-react";
 
+// Always fetch fresh data — never serve a cached version of the blog list
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Blog — Writing Tips, Deadlines & Productivity",
   description: "Expert tips on academic writing, meeting tight deadlines, productivity hacks, and professional writing strategies from the WriteProf team.",

@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "10");
+    // Prevent Cloudflare from caching blog API responses
     const search = url.searchParams.get("search") || "";
     const category = url.searchParams.get("category") || "";
     const isAdmin = url.searchParams.get("admin") === "true";
@@ -55,6 +56,8 @@ export async function GET(req: NextRequest) {
       success: true,
       data: { posts },
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    }, {
+      headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
     });
   } catch (err) {
     return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
