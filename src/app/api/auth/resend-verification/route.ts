@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     });
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://writeprof.com";
-    const verifyUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
+    const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${emailVerificationToken}`;
     const tmpl = emailTemplates.verifyEmail(user.name, verifyUrl);
 
     await sendEmail({ to: user.email, subject: tmpl.subject, html: tmpl.html });

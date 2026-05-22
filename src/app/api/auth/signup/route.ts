@@ -83,7 +83,8 @@ export async function POST(req: NextRequest) {
 
     // Send verification email — awaited so Vercel doesn't kill it before delivery
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://writeprof.com";
-    const verifyUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
+    // Link goes directly to the API — sets cookie + redirects to dashboard in one step
+    const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${emailVerificationToken}`;
     const verifyTmpl = emailTemplates.verifyEmail(user.name, verifyUrl);
     try {
       await sendEmail({ to: user.email, subject: verifyTmpl.subject, html: verifyTmpl.html });

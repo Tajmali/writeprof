@@ -19,26 +19,9 @@ function VerifyEmailContent() {
       return;
     }
 
-    // Hit the API route — it redirects on success, returns JSON on error
-    fetch(`/api/auth/verify-email?token=${token}`)
-      .then(async (res) => {
-        if (res.redirected) {
-          // Successful — follow redirect
-          router.push(new URL(res.url).pathname);
-          return;
-        }
-        if (res.ok) {
-          setStatus("success");
-        } else {
-          const data = await res.json();
-          setStatus("error");
-          setMessage(data.error || "Verification failed");
-        }
-      })
-      .catch(() => {
-        setStatus("error");
-        setMessage("Something went wrong. Please try again.");
-      });
+    // Use direct browser navigation so the API can set the auth cookie properly.
+    // fetch() doesn't reliably store cookies from redirected API responses.
+    window.location.href = `/api/auth/verify-email?token=${encodeURIComponent(token)}`;
   }, [token, router]);
 
   return (
