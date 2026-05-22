@@ -20,6 +20,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // Check Cloudinary env vars first
+  if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    return NextResponse.json({
+      success: false,
+      error: "Cloudinary not configured — add NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET to Vercel env vars",
+    }, { status: 500 });
+  }
+
   try {
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
@@ -42,8 +50,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, data: result });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Upload error:", err);
-    return NextResponse.json({ success: false, error: "Upload failed" }, { status: 500 });
+    return NextResponse.json({ success: false, error: err?.message || "Upload failed" }, { status: 500 });
   }
 }
