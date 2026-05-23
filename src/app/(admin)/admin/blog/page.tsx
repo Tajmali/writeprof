@@ -96,17 +96,32 @@ export default function AdminBlogPage() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const openEdit = (post: BlogPost) => {
+  const openEdit = async (post: BlogPost) => {
     setEditingPost(post);
-    setForm({
-      title: post.title,
-      excerpt: post.excerpt || "",
-      content: "",
-      category: post.category || "",
-      coverImage: post.coverImage || "",
-      readTime: post.readTime || 5,
-    });
     setShowForm(true);
+    // Fetch full post content from API (list view omits content field)
+    try {
+      const res = await fetch(`/api/blog/${post.id}`);
+      const json = await res.json();
+      const fullPost = json.success ? json.data.post : post;
+      setForm({
+        title: fullPost.title ?? post.title,
+        excerpt: fullPost.excerpt ?? post.excerpt ?? "",
+        content: fullPost.content ?? "",
+        category: fullPost.category ?? post.category ?? "",
+        coverImage: fullPost.coverImage ?? post.coverImage ?? "",
+        readTime: fullPost.readTime ?? post.readTime ?? 5,
+      });
+    } catch {
+      setForm({
+        title: post.title,
+        excerpt: post.excerpt || "",
+        content: "",
+        category: post.category || "",
+        coverImage: post.coverImage || "",
+        readTime: post.readTime || 5,
+      });
+    }
   };
 
   const openCreate = () => {
@@ -116,6 +131,7 @@ export default function AdminBlogPage() {
   };
 
   return (
+    <>
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -367,12 +383,13 @@ export default function AdminBlogPage() {
       )}
     </div>
 
-      {/* Preview Modal */}
-      <AnimatePresence>
-        {showPreview && (
-          <BlogPreviewModal form={form} onClose={() => setShowPreview(false)} />
-        )}
-      </AnimatePresence>
+    {/* Preview Modal */}
+    <AnimatePresence>
+      {showPreview && (
+        <BlogPreviewModal form={form} onClose={() => setShowPreview(false)} />
+      )}
+    </AnimatePresence>
+    </>
   );
 }
 
