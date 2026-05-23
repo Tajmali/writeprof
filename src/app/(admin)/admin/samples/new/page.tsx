@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Plus, Trash2, Save, Eye, Paperclip } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, Eye, Paperclip, Upload, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ORDER_TYPES = ["Essay", "Research Paper", "Dissertation", "Case Study", "Term Paper", "Coursework", "Report", "Business Plan", "Annotated Bibliography", "Literature Review", "Thesis", "Other"];
@@ -22,6 +22,7 @@ export default function NewSamplePage() {
   const [saving, setSaving] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [newAttachment, setNewAttachment] = useState({ name: "", url: "" });
+  const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -154,8 +155,9 @@ export default function NewSamplePage() {
               <Paperclip className="w-4 h-4 text-brand-400" />
               <h2 className="text-white font-semibold text-sm">Attachments (optional)</h2>
             </div>
-            <p className="text-slate-500 text-xs">Add links to files (Google Drive, Dropbox, or any public URL). Clients will see these as downloadable resources.</p>
+            <p className="text-slate-500 text-xs">Upload instruction files (PDF, Word, images) directly, or paste a link from Google Drive / Dropbox.</p>
 
+            {/* Uploaded files list */}
             {attachments.map((a, i) => (
               <div key={i} className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
                 <Paperclip className="w-4 h-4 text-slate-400 shrink-0" />
@@ -169,6 +171,62 @@ export default function NewSamplePage() {
               </div>
             ))}
 
+            {/* Direct file upload */}
+            <label className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-xl transition-all cursor-pointer
+              ${uploading ? "border-brand-500/50 bg-brand-500/5" : "border-white/20 hover:border-brand-500/50 hover:bg-white/3"}`}>
+              {uploading ? (
+                <div className="flex items-center gap-2 text-brand-400">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-sm">Uploading...</span>
+                </div>
+              ) : (
+                <>
+                  <Upload className="w-6 h-6 text-gray-500 mb-2" />
+                  <span className="text-sm text-gray-400">Click to upload a file</span>
+                  <span className="text-xs text-gray-600 mt-1">PDF, DOCX, DOC, PNG, JPG — max 10MB</span>
+                </>
+              )}
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.pptx,.xlsx,.txt"
+                className="hidden"
+                disabled={uploading}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (file.size > 10 * 1024 * 1024) { toast.error("File must be under 10MB"); return; }
+                  setUploading(true);
+                  try {
+                    const fd = new FormData();
+                    fd.append("file", file);
+                    const res = await fetch("/api/upload", { method: "POST", body: fd });
+                    const json = await res.json();
+                    if (!json.success) throw new Error(json.error);
+                    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+                    const mimeType =
+                      ext === "pdf" ? "application/pdf" :
+                      ext === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" :
+                      ext === "doc" ? "application/msword" :
+                      ext === "pptx" ? "application/vnd.openxmlformats-officedocument.presentationml.presentation" :
+                      file.type || "application/octet-stream";
+                    setAttachments((prev) => [...prev, { name: file.name, url: json.data.url, mimeType }]);
+                    toast.success(`${file.name} uploaded!`);
+                  } catch (err: any) {
+                    toast.error(err.message || "Upload failed");
+                  } finally {
+                    setUploading(false);
+                    e.target.value = "";
+                  }
+                }}
+              />
+            </label>
+
+            {/* OR paste a URL manually */}
+            <div className="relative flex items-center gap-2">
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="text-xs text-slate-500 shrink-0">or paste a link</span>
+              <div className="flex-1 h-px bg-white/10" />
+            </div>
             <div className="grid grid-cols-2 gap-2">
               <input
                 value={newAttachment.name}
@@ -179,7 +237,7 @@ export default function NewSamplePage() {
               <input
                 value={newAttachment.url}
                 onChange={(e) => setNewAttachment((p) => ({ ...p, url: e.target.value }))}
-                placeholder="File URL (Google Drive, Dropbox…)"
+                placeholder="Google Drive / Dropbox URL"
                 className="input-field text-sm"
               />
             </div>
@@ -188,7 +246,7 @@ export default function NewSamplePage() {
               disabled={!newAttachment.name || !newAttachment.url}
               className="btn-secondary flex items-center gap-2 text-sm px-4 py-2 disabled:opacity-40"
             >
-              <Plus className="w-4 h-4" /> Add Attachment
+              <Plus className="w-4 h-4" /> Add Link
             </button>
           </div>
         </div>
