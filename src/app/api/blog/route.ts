@@ -135,7 +135,9 @@ export async function PATCH(req: NextRequest) {
     const post = await prisma.blogPost.update({
       where: { id },
       data: {
-        ...(updates.title && { title: updates.title, slug: generateSlug(updates.title) }),
+        // Never regenerate the slug on edit — it would break existing URLs and SEO links.
+        // The slug is set once on creation and stays fixed forever.
+        ...(updates.title && { title: updates.title }),
         ...(updates.excerpt !== undefined && { excerpt: updates.excerpt || "" }),
         ...(updates.content && { content: updates.content }),
         ...(updates.category && { category: updates.category }),

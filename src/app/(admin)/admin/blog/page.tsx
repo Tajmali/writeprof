@@ -17,8 +17,9 @@ interface BlogPost {
 }
 
 const BLOG_CATEGORIES = [
-  "Writing Tips", "Academic Help", "Career Advice", "Platform Updates",
-  "Success Stories", "Industry News", "Tutorials",
+  "Writing Tips", "Academic Help", "Academic Tips", "Career Advice",
+  "Platform Updates", "Success Stories", "Industry News", "Tutorials",
+  "Urgent Writing Help", "Deadline Management", "Copywriting", "Productivity",
 ];
 
 export default function AdminBlogPage() {
