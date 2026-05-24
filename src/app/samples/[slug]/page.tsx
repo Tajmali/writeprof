@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowLeft, FileText, GraduationCap, BookOpen, Globe, Hash, Paperclip, Download, Eye } from "lucide-react";
 
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const sample = await prisma.sampleOrder.findFirst({
-    where: { slug: params.slug, isPublished: true },
+    where: { slug, isPublished: true },
   });
   if (!sample) return { title: "Sample Not Found" };
 
@@ -30,8 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function SampleOrderPage({ params }: Props) {
+  const { slug } = await params;
   const sample = await prisma.sampleOrder.findFirst({
-    where: { slug: params.slug, isPublished: true },
+    where: { slug, isPublished: true },
     include: { attachments: true },
   });
 

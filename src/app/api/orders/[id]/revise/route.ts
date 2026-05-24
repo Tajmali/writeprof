@@ -5,8 +5,9 @@ import { verifyToken } from "@/lib/auth";
 
 const reviseSchema = z.object({ notes: z.string().min(10, "Please provide detailed revision instructions (min 10 chars)") });
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
     const payload = await verifyToken(token);
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const { notes } = reviseSchema.parse(body);
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id, clientId: payload.userId },
+      where: { id: id, clientId: payload.userId },
       include: { writer: { select: { userId: true } } },
     });
     if (!order) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     await prisma.$transaction([
       prisma.order.update({
-        where: { id: params.id },
+        where: { id: id },
         data: { status: "REVISION_REQUESTED", revisionCount: { increment: 1 } },
       }),
       ...(order.writer
@@ -35,13 +36,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
               type: "ORDER_REVISION",
               title: "Revision Requested",
               message: `Client has requested a revision on order "${order.title}": ${notes.slice(0, 100)}`,
-              orderId: params.id,
+              orderId: id,
             },
           })]
         : []),
       prisma.message.create({
         data: {
-          orderId: params.id,
+          orderId: id,
           senderId: payload.userId,
           content: `📝 **Revision Request** (${order.revisionCount + 1}/${order.maxRevisions})\n\n${notes}`,
         },

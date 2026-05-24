@@ -3,13 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
 // ─── PATCH /api/proposals/[id] — cancel (writer) or update status (admin) ──
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
     const proposal = await prisma.proposal.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { writer: true, order: true },
     });
     if (!proposal) return NextResponse.json({ success: false, error: "Proposal not found" }, { status: 404 });
@@ -26,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         return NextResponse.json({ success: false, error: "Only open proposals can be cancelled" }, { status: 400 });
       }
       const updated = await prisma.proposal.update({
-        where: { id: params.id },
+        where: { id: id },
         data: { status: "CANCELED" },
       });
       return NextResponse.json({ success: true, data: { proposal: updated } });
@@ -38,12 +39,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         // Set this proposal to UNCONFIRMED, assign writer to the order
         const [updated] = await prisma.$transaction([
           prisma.proposal.update({
-            where: { id: params.id },
+            where: { id: id },
             data: { status: "UNCONFIRMED" },
           }),
           // Decline all other proposals for the same order
           prisma.proposal.updateMany({
-            where: { orderId: proposal.orderId, id: { not: params.id }, status: "OPEN" },
+            where: { orderId: proposal.orderId, id: { not: id }, status: "OPEN" },
             data: { status: "DECLINED", note: "Another writer was selected for this order." },
           }),
           // Assign the writer to the order
@@ -61,7 +62,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
       if (action === "decline") {
         const updated = await prisma.proposal.update({
-          where: { id: params.id },
+          where: { id: id },
           data: { status: "DECLINED", note: note || "Your proposal was not selected." },
         });
         return NextResponse.json({ success: true, data: { proposal: updated } });

@@ -8,8 +8,9 @@ const resolveSchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function POST(req: NextRequest, { params }: { params: { orderId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   try {
+    const { orderId } = await params;
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
     const payload = await verifyToken(token);
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
     const { resolution, notes } = resolveSchema.parse(body);
 
     const order = await prisma.order.findUnique({
-      where: { id: params.orderId },
+      where: { id: orderId },
       include: {
         payment: true,
         writer: { include: { user: true } },

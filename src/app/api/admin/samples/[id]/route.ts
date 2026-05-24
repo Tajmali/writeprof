@@ -3,15 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 
 // GET single sample
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const sample = await prisma.sampleOrder.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { attachments: true },
     });
 
@@ -25,8 +26,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // PUT — update sample
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -40,10 +42,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     } = body;
 
     // Delete old attachments and recreate
-    await prisma.sampleOrderFile.deleteMany({ where: { sampleOrderId: params.id } });
+    await prisma.sampleOrderFile.deleteMany({ where: { sampleOrderId: id } });
 
     const sample = await prisma.sampleOrder.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         subject,
@@ -78,14 +80,15 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    await prisma.sampleOrder.delete({ where: { id: params.id } });
+    await prisma.sampleOrder.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch (err) {

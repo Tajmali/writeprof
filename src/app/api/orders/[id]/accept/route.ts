@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ success: false, error: "You have reached the maximum active orders limit (5)" }, { status: 400 });
     }
 
-    const order = await prisma.order.findUnique({ where: { id: params.id } });
+    const order = await prisma.order.findUnique({ where: { id: id } });
     if (!order) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
     if (order.status !== "PENDING") {
       return NextResponse.json({ success: false, error: "Order is no longer available" }, { status: 400 });
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     const updated = await prisma.$transaction([
       prisma.order.update({
-        where: { id: params.id },
+        where: { id: id },
         data: { writerId: writerProfile.id, status: "ASSIGNED", assignedAt: new Date() },
       }),
       prisma.writerProfile.update({

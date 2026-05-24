@@ -11,8 +11,9 @@ const submitSchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
     const payload = await verifyToken(token);
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     if (!writerProfile) return NextResponse.json({ success: false, error: "Profile not found" }, { status: 404 });
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id, writerId: writerProfile.id },
+      where: { id: id, writerId: writerProfile.id },
       include: { client: true },
     });
     if (!order) return NextResponse.json({ success: false, error: "Order not found or not assigned to you" }, { status: 404 });
@@ -36,13 +37,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     // Get existing submission count for version number
-    const submissionCount = await prisma.submission.count({ where: { orderId: params.id } });
+    const submissionCount = await prisma.submission.count({ where: { orderId: id } });
     const isRevision = order.status === "REVISION_REQUESTED";
 
     const [submission] = await prisma.$transaction([
       prisma.submission.create({
         data: {
-          orderId: params.id,
+          orderId: id,
           content: data.content,
           fileUrl: data.fileUrl,
           fileName: data.fileName,
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         },
       }),
       prisma.order.update({
-        where: { id: params.id },
+        where: { id: id },
         data: { status: "UNDER_REVIEW" },
       }),
       prisma.notification.create({
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
           message: isRevision
             ? `Your revision for "${order.title}" has been delivered. Please review and approve.`
             : `Your order "${order.title}" has been completed. Please review the work.`,
-          orderId: params.id,
+          orderId: id,
         },
       }),
     ]);

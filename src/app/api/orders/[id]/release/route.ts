@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
     const payload = await verifyToken(token);
     if (!payload || payload.role !== "CLIENT") return NextResponse.json({ success: false, error: "Client access required" }, { status: 403 });
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id, clientId: payload.userId },
+      where: { id: id, clientId: payload.userId },
       include: { writer: { include: { user: true } }, payment: true },
     });
     if (!order) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
@@ -20,11 +21,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     await prisma.$transaction([
       prisma.order.update({
-        where: { id: params.id },
+        where: { id: id },
         data: { status: "COMPLETED", completedAt: new Date() },
       }),
       prisma.payment.update({
-        where: { orderId: params.id },
+        where: { orderId: id },
         data: { status: "RELEASED", releasedAt: new Date() },
       }),
       // Credit writer wallet
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                 type: "PAYMENT_RELEASED",
                 title: "Payment Released!",
                 message: `$${order.payment.writerAmount.toLocaleString()} has been added to your wallet for order "${order.title}".`,
-                orderId: params.id,
+                orderId: id,
               },
             }),
           ]

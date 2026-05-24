@@ -7,9 +7,9 @@ import { prisma } from "@/lib/prisma";
 export default async function ReferralRedirectPage({
   params,
 }: {
-  params: { code: string };
+  params: Promise<{ code: string }>;
 }) {
-  const { code } = params;
+  const { code } = await params;
 
   // Validate the code exists
   const user = await prisma.user.findUnique({

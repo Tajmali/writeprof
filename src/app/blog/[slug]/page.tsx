@@ -2,20 +2,22 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { ArrowLeft, Clock, User, Calendar, Tag, Share2, BookOpen } from "lucide-react";
+import sanitizeHtml from "sanitize-html";
 
 // Always fetch fresh data — ensures deleted/updated posts reflect immediately
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-import { ArrowLeft, Clock, User, Calendar, Tag, Share2, BookOpen } from "lucide-react";
-import sanitizeHtml from "sanitize-html";
 
+// Next.js 15+ passes params as a Promise — always await it
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const post = await prisma.blogPost.findFirst({
-    where: { slug: params.slug, isPublished: true },
+    where: { slug, isPublished: true },
   });
 
   if (!post) return { title: "Post Not Found | WriteProf" };
@@ -45,8 +47,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: Props) {
+  const { slug } = await params;
   const post = await prisma.blogPost.findFirst({
-    where: { slug: params.slug, isPublished: true },
+    where: { slug, isPublished: true },
   });
 
   if (!post) notFound();
@@ -54,7 +57,7 @@ export default async function BlogPostPage({ params }: Props) {
   const relatedPosts = await prisma.blogPost.findMany({
     where: {
       isPublished: true,
-      slug: { not: params.slug },
+      slug: { not: slug },
       category: post.category,
     },
     take: 3,

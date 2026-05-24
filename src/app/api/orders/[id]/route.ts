@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { sendEmail, emailTemplates } from "@/lib/email";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     if (!payload) return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 });
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         client: { select: { id: true, name: true, email: true, avatar: true } },
         writer: { include: { user: { select: { id: true, name: true, avatar: true, email: true } } } },
@@ -40,8 +41,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const token = req.cookies.get("wp_token")?.value;
     if (!token) return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
 
@@ -52,7 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     const { status, writerId, revisionNotes } = body;
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { client: true },
     });
     if (!order) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
@@ -93,7 +95,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
 
     const updated = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
     });
 
