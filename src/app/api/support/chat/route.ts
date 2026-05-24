@@ -87,10 +87,7 @@ export async function POST(req: NextRequest) {
         .map((m: { role: string; content: string }) => `${m.role === "user" ? "User" : "Aria"}: ${m.content}`)
         .join("\n\n");
 
-      const adminEmail = process.env.ADMIN_EMAIL;
-      if (!adminEmail) {
-        console.error("ADMIN_EMAIL env var not set — cannot send human support notification");
-      } else {
+      const adminEmail = process.env.ADMIN_EMAIL || "oriaventures@gmail.com";
       sendEmail({
         to: adminEmail,
         subject: "🆘 Support Chat — User Requested Human Agent",
@@ -110,7 +107,6 @@ ${transcript}
           </div>
         `,
       }).catch(console.error);
-      } // end if adminEmail
 
       return NextResponse.json({
         success: true,
