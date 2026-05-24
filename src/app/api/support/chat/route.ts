@@ -52,9 +52,9 @@ Convert hesitant visitors into paying clients:
 
 export async function POST(req: NextRequest) {
   try {
-    // Rate limit: 30 messages per IP per hour to prevent API cost exhaustion
+    // Rate limit: 30 messages per IP per hour (distributed via Upstash when configured)
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    const limit = rateLimiter.check(`chat:${ip}`, 30, 60 * 60 * 1000);
+    const limit = await rateLimiter.checkAsync(`chat:${ip}`, 30, 60 * 60 * 1000);
     if (!limit.allowed) {
       return NextResponse.json(
         { success: false, error: "Too many messages. Please try again later." },

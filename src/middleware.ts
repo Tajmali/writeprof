@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 function getJwtSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET || "writeprof-jwt-super-secret-key-2026-production-ready";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error("JWT_SECRET environment variable is not set");
   return new TextEncoder().encode(secret);
 }
 
-const PUBLIC_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/verify-email", "/blog", "/about", "/contact", "/terms", "/privacy", "/refund", "/help", "/samples", "/writer/apply", "/ref"];
-const API_PUBLIC_ROUTES = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/google", "/api/auth/verify-email", "/api/auth/resend-verification", "/api/auth/forgot-password", "/api/stats", "/api/blog"];
+const PUBLIC_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/verify-email", "/blog", "/about", "/contact", "/terms", "/privacy", "/refund", "/help", "/samples", "/writer/apply", "/ref"];
+const API_PUBLIC_ROUTES = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/google", "/api/auth/verify-email", "/api/auth/resend-verification", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/stats", "/api/blog"];
 const CLIENT_ROUTES = ["/dashboard"];
 const WRITER_ROUTES = ["/writer-dashboard"];
 const ADMIN_ROUTES = ["/admin"];

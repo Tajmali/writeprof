@@ -1,34 +1,30 @@
 /**
- * Lightweight in-memory rate limiter.
+ * Distributed rate limiter using Upstash Redis when configured,
+ * falling back to in-memory for local development.
  *
- * Works well for single-process deployments. On Vercel, each serverless function
- * instance has its own memory, so limits are per-instance. This still provides
- * meaningful protection against simple brute-force bursts.
- *
- * For strict, distributed rate limiting upgrade to @upstash/ratelimit + Upstash Redis.
+ * To enable distributed rate limiting (required for Vercel serverless):
+ * 1. Create a free Redis database at https://console.upstash.com
+ * 2. Add to Vercel env vars:
+ *    UPSTASH_REDIS_REST_URL=https://...
+ *    UPSTASH_REDIS_REST_TOKEN=...
  */
+
+// ─── In-memory fallback (dev / no Upstash configured) ───────────────────────
 
 interface RateLimitEntry {
   count: number;
-  firstRequest: number;
   resetAt: number;
 }
 
-class RateLimiter {
+class InMemoryRateLimiter {
   private store = new Map<string, RateLimitEntry>();
 
-  // Purge stale entries every 5 minutes to prevent memory leaks
   constructor() {
     if (typeof globalThis !== "undefined") {
       setInterval(() => this.purge(), 5 * 60 * 1000).unref?.();
     }
   }
 
-  /**
-   * @param key        Unique key (e.g. "login:1.2.3.4")
-   * @param limit      Max requests allowed in the window
-   * @param windowMs   Time window in milliseconds
-   */
   check(
     key: string,
     limit: number,
@@ -38,14 +34,12 @@ class RateLimiter {
     const entry = this.store.get(key);
 
     if (!entry || now > entry.resetAt) {
-      // New window
-      this.store.set(key, { count: 1, firstRequest: now, resetAt: now + windowMs });
+      this.store.set(key, { count: 1, resetAt: now + windowMs });
       return { allowed: true, remaining: limit - 1 };
     }
 
     if (entry.count >= limit) {
-      const retryAfterSeconds = Math.ceil((entry.resetAt - now) / 1000);
-      return { allowed: false, remaining: 0, retryAfterSeconds };
+      return { allowed: false, remaining: 0, retryAfterSeconds: Math.ceil((entry.resetAt - now) / 1000) };
     }
 
     entry.count++;
@@ -64,5 +58,80 @@ class RateLimiter {
   }
 }
 
-// Singleton — shared across requests in the same process/instance
-export const rateLimiter = new RateLimiter();
+// ─── Upstash distributed rate limiter ───────────────────────────────────────
+
+let upstashLimiter: any = null;
+
+function getUpstashLimiter() {
+  if (upstashLimiter) return upstashLimiter;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  try {
+    const { Redis } = require("@upstash/redis");
+    const { Ratelimit } = require("@upstash/ratelimit");
+    const redis = new Redis({ url, token });
+    // Create limiters for different windows — keyed by "limit:windowSec"
+    upstashLimiter = { redis, Ratelimit };
+    return upstashLimiter;
+  } catch {
+    return null;
+  }
+}
+
+// ─── Unified interface ───────────────────────────────────────────────────────
+
+const inMemory = new InMemoryRateLimiter();
+
+export const rateLimiter = {
+  /**
+   * Check rate limit for a key.
+   * Uses Upstash Redis if UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN are set,
+   * otherwise falls back to in-memory (development only).
+   */
+  async checkAsync(
+    key: string,
+    limit: number,
+    windowMs: number
+  ): Promise<{ allowed: boolean; remaining: number; retryAfterSeconds?: number }> {
+    const upstash = getUpstashLimiter();
+    if (upstash) {
+      try {
+        const { Ratelimit, redis } = upstash;
+        const windowSec = Math.ceil(windowMs / 1000);
+        const rl = new Ratelimit({
+          redis,
+          limiter: Ratelimit.slidingWindow(limit, `${windowSec} s`),
+          prefix: "wp_rl",
+        });
+        const result = await rl.limit(key);
+        return {
+          allowed: result.success,
+          remaining: result.remaining,
+          retryAfterSeconds: result.success ? undefined : Math.ceil((result.reset - Date.now()) / 1000),
+        };
+      } catch {
+        // Redis error — fall through to in-memory
+      }
+    }
+    return inMemory.check(key, limit, windowMs);
+  },
+
+  /**
+   * Synchronous check — uses in-memory only.
+   * Kept for backwards compatibility with existing callers.
+   * Prefer checkAsync() for new code.
+   */
+  check(
+    key: string,
+    limit: number,
+    windowMs: number
+  ): { allowed: boolean; remaining: number; retryAfterSeconds?: number } {
+    return inMemory.check(key, limit, windowMs);
+  },
+
+  reset(key: string): void {
+    inMemory.reset(key);
+  },
+};

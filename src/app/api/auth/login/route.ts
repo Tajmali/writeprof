@@ -10,9 +10,9 @@ const loginSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  // Rate limiting: 8 attempts per IP per 15 minutes
+  // Rate limiting: 8 attempts per IP per 15 minutes (distributed via Upstash when configured)
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-  const rl = rateLimiter.check(`login:${ip}`, 8, 15 * 60 * 1000);
+  const rl = await rateLimiter.checkAsync(`login:${ip}`, 8, 15 * 60 * 1000);
   if (!rl.allowed) {
     return NextResponse.json(
       { success: false, error: `Too many login attempts. Try again in ${Math.ceil(rl.retryAfterSeconds!)}s.` },
