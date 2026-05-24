@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const securityHeaders = [
+  // Force HTTPS for 2 years — prevents downgrade attacks
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   // Prevent MIME type sniffing
   { key: "X-Content-Type-Options", value: "nosniff" },
   // Prevent clickjacking — only allow framing from same origin

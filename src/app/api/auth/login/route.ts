@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
     // Clear rate-limit counter on successful login
     rateLimiter.reset(`login:${ip}`);
 
+    // Never return the raw token in the body — it lives only in the httpOnly cookie
     const response = NextResponse.json({
       success: true,
       data: {
@@ -94,7 +95,6 @@ export async function POST(req: NextRequest) {
           wallet: user.wallet,
           createdAt: user.createdAt,
         },
-        token,
       },
     });
 

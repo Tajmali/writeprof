@@ -5,9 +5,10 @@ import { prisma } from "./prisma";
 import type { User } from "@/types";
 
 // ─── JWT Secret ──────────────────────────────────────────────────────────────
-// Throws at call-time in production if the env var is missing.
+// Throws at startup if JWT_SECRET env var is missing — never fall back to a known string.
 function getJwtSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET || "writeprof-jwt-super-secret-key-2026-production-ready";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error("JWT_SECRET environment variable is not set");
   return new TextEncoder().encode(secret);
 }
 
@@ -102,7 +103,9 @@ export async function clearAuthCookie() {
 
 // ─── Misc ─────────────────────────────────────────────────────────────────────
 export function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  // Use cryptographically secure random — Math.random() is NOT safe for OTPs
+  const { randomInt } = require("crypto");
+  return randomInt(100000, 1000000).toString();
 }
 
 export function generateReferralCode(name: string): string {

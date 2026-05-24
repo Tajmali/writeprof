@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { sendEmail } from "@/lib/email";
+import { rateLimiter } from "@/lib/rate-limit";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -51,10 +52,33 @@ Convert hesitant visitors into paying clients:
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 30 messages per IP per hour to prevent API cost exhaustion
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const limit = rateLimiter.check(`chat:${ip}`, 30, 60 * 60 * 1000);
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { success: false, error: "Too many messages. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { messages, requestHuman } = await req.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ success: false, error: "No messages provided" }, { status: 400 });
+    }
+
+    // Validate message structure and cap lengths to prevent prompt injection / abuse
+    if (messages.length > 50) {
+      return NextResponse.json({ success: false, error: "Too many messages in conversation" }, { status: 400 });
+    }
+    for (const m of messages) {
+      if (typeof m.role !== "string" || !["user", "assistant"].includes(m.role)) {
+        return NextResponse.json({ success: false, error: "Invalid message format" }, { status: 400 });
+      }
+      if (typeof m.content !== "string" || m.content.length > 2000) {
+        return NextResponse.json({ success: false, error: "Message too long" }, { status: 400 });
+      }
     }
 
     // If user explicitly requests a human, email the admin the conversation
@@ -63,8 +87,12 @@ export async function POST(req: NextRequest) {
         .map((m: { role: string; content: string }) => `${m.role === "user" ? "User" : "Aria"}: ${m.content}`)
         .join("\n\n");
 
+      const adminEmail = process.env.ADMIN_EMAIL;
+      if (!adminEmail) {
+        console.error("ADMIN_EMAIL env var not set — cannot send human support notification");
+      } else {
       sendEmail({
-        to: process.env.ADMIN_EMAIL || "oriaventures@gmail.com",
+        to: adminEmail,
         subject: "🆘 Support Chat — User Requested Human Agent",
         html: `
           <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; border-radius: 12px; overflow: hidden;">
@@ -82,10 +110,11 @@ ${transcript}
           </div>
         `,
       }).catch(console.error);
+      } // end if adminEmail
 
       return NextResponse.json({
         success: true,
-        reply: "Done! 💙 I've just alerted our human support team with your full conversation. You'll hear from us at oriaventures@gmail.com within a few hours. Is there anything else I can help with while you wait?",
+        reply: "Done! 💙 I've just alerted our human support team with your full conversation. You'll hear from us shortly. Is there anything else I can help with while you wait?",
       });
     }
 

@@ -57,11 +57,34 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     });
     if (!order) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
 
+    // Authorization: clients can only act on their own orders; writers use dedicated routes
+    if (payload.role === "CLIENT" && order.clientId !== payload.userId) {
+      return NextResponse.json({ success: false, error: "Access denied" }, { status: 403 });
+    }
+    if (payload.role === "WRITER") {
+      // Writers interact with orders through dedicated /accept, /submit routes — not this generic PATCH
+      return NextResponse.json({ success: false, error: "Access denied" }, { status: 403 });
+    }
+
+    // Validate status is a known enum value
+    const VALID_STATUSES = ["PENDING", "ASSIGNED", "IN_PROGRESS", "SUBMITTED", "REVISION_REQUESTED", "COMPLETED", "CANCELLED", "DISPUTED"];
+    if (status && !VALID_STATUSES.includes(status)) {
+      return NextResponse.json({ success: false, error: "Invalid status value" }, { status: 400 });
+    }
+
+    // Clients may only request specific transitions — not arbitrary status changes
+    if (payload.role === "CLIENT") {
+      const clientAllowed = ["COMPLETED", "REVISION_REQUESTED", "DISPUTED"];
+      if (status && !clientAllowed.includes(status)) {
+        return NextResponse.json({ success: false, error: "Access denied" }, { status: 403 });
+      }
+    }
+
     const updateData: Record<string, unknown> = {};
 
     if (status) updateData.status = status;
     if (status === "COMPLETED") updateData.completedAt = new Date();
-    if (status === "ASSIGNED" && writerId) {
+    if (status === "ASSIGNED" && writerId && payload.role === "ADMIN") {
       updateData.writerId = writerId;
       updateData.assignedAt = new Date();
     }

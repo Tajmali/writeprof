@@ -483,7 +483,8 @@ function BlogPreviewModal({
 }
 
 function formatPreviewContent(content: string): string {
-  return content
+  // First convert markdown-like syntax to HTML
+  const raw = content
     .replace(/^#### (.+)$/gm, "<h4>$1</h4>")
     .replace(/^### (.+)$/gm, "<h3>$1</h3>")
     .replace(/^## (.+)$/gm, "<h2>$1</h2>")
@@ -496,4 +497,15 @@ function formatPreviewContent(content: string): string {
     .replace(/\n\n/g, "</p><p>")
     .replace(/^(?!<[a-z])(.+)$/gm, "<p>$1</p>")
     .replace(/<p><\/p>/g, "");
+
+  // Sanitize to prevent XSS in the admin preview (same rules as the public blog)
+  // We import dynamically to avoid bundling sanitize-html in client JS unnecessarily
+  // Since this runs client-side, use a simple tag-stripper for truly dangerous content
+  return raw
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/\bon\w+\s*=/gi, "data-removed=")
+    .replace(/<iframe[\s\S]*?<\/iframe>/gi, "")
+    .replace(/<object[\s\S]*?<\/object>/gi, "")
+    .replace(/<embed[^>]*>/gi, "")
+    .replace(/javascript:/gi, "");
 }
