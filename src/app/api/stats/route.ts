@@ -32,7 +32,7 @@ export async function GET() {
         avgRating:       Math.min(5, Math.round(avgRating * 10) / 10),
       },
     }, {
-      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+      headers: { "Cache-Control": "no-store" },
     });
   } catch (err) {
     console.error("Stats error:", err);

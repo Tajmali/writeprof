@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { Zap, Clock, Shield, Star, ArrowRight, CheckCircle } from "lucide-react";
@@ -15,16 +15,14 @@ const DEFAULT_STATS = [
 const trustedBy = ["Harvard Students", "Fortune 500 Companies", "Marketing Agencies", "PhD Researchers"];
 
 function AnimatedCounter({ value, suffix, decimal = false }: { value: number; suffix?: string; decimal?: boolean }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
+  const [count, setCount] = useState(value); // start at final value — no zero flash
 
   useEffect(() => {
-    if (!inView) return;
-    const duration = 2000;
-    const steps = 60;
-    const increment = value / steps;
+    // Re-animate when value updates (e.g. API response arrives)
     let current = 0;
+    const steps = 60;
+    const duration = 1800;
+    const increment = value / steps;
     const timer = setInterval(() => {
       current += increment;
       if (current >= value) {
@@ -35,10 +33,10 @@ function AnimatedCounter({ value, suffix, decimal = false }: { value: number; su
       }
     }, duration / steps);
     return () => clearInterval(timer);
-  }, [inView, value, decimal]);
+  }, [value, decimal]);
 
   return (
-    <span ref={ref}>
+    <span>
       {decimal ? count.toFixed(1) : count.toLocaleString()}
       {suffix}
     </span>
