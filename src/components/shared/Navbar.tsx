@@ -10,7 +10,24 @@ import { Logo } from "@/components/shared/Logo";
 
 const navLinks = [
   { label: "How It Works", href: "/#how-it-works", sectionId: "how-it-works" },
-  { label: "Services",     href: "/#categories",   sectionId: "categories" },
+  {
+    label: "Services",
+    href: "/services",
+    children: [
+      { label: "Essay Writing",          href: "/signup?service=Essay+Writing" },
+      { label: "Research Papers",        href: "/signup?service=Research+Papers" },
+      { label: "Dissertations & Theses", href: "/signup?service=Dissertations+%26+Theses" },
+      { label: "Copywriting",            href: "/signup?service=Copywriting" },
+      { label: "Proofreading & Editing", href: "/signup?service=Proofreading+%26+Editing" },
+      { label: "Blog & SEO Content",     href: "/signup?service=Blog+%26+SEO+Content" },
+      { label: "Business Writing",       href: "/signup?service=Business+Writing" },
+      { label: "Case Studies",           href: "/signup?service=Case+Studies" },
+      { label: "Lab Reports & STEM",     href: "/signup?service=Lab+Reports+%26+STEM" },
+      { label: "Presentations",          href: "/signup?service=Presentations" },
+      { label: "CVs & Cover Letters",    href: "/signup?service=CVs+%26+Cover+Letters" },
+      { label: "View All Services →",    href: "/services" },
+    ],
+  },
   { label: "Pricing",      href: "/#pricing",       sectionId: "pricing" },
   { label: "Writers",      href: "/#writers",       sectionId: "writers" },
   {
@@ -91,16 +108,25 @@ export function Navbar() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.95 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute top-full left-0 mt-1 w-48 glass rounded-xl overflow-hidden shadow-2xl"
+                        className={`absolute top-full left-0 mt-1 glass rounded-xl overflow-hidden shadow-2xl ${
+                          link.label === "Services" ? "w-[420px] grid grid-cols-2" : "w-48"
+                        }`}
                         onMouseEnter={() => setOpenDropdown(link.label)}
                         onMouseLeave={() => setOpenDropdown(null)}
                       >
+                        {link.label === "Services" && (
+                          <div className="col-span-2 px-4 pt-3 pb-1 border-b border-white/10">
+                            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Emergency Writing Services</p>
+                          </div>
+                        )}
                         {link.children.map((child) => (
                           <Link
                             key={child.label}
                             href={child.href}
                             onClick={(e) => handleSectionClick(e, (child as any).sectionId)}
-                            className="block px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                            className={`block px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/10 transition-colors ${
+                              child.label.includes("View All") ? "col-span-2 text-brand-400 border-t border-white/10 font-medium" : ""
+                            }`}
                           >
                             {child.label}
                           </Link>

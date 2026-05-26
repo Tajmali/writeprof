@@ -2,13 +2,14 @@ import Link from "next/link";
 import { Zap, Mail, MapPin } from "lucide-react";
 
 const footerLinks = {
-  Services: [
-    { label: "Essay Writing", href: "/signup" },
-    { label: "Research Papers", href: "/signup" },
-    { label: "Copywriting", href: "/signup" },
-    { label: "Proofreading", href: "/signup" },
-    { label: "Dissertation Help", href: "/signup" },
-    { label: "Emergency Writing", href: "/signup" },
+  "Emergency Writing": [
+    { label: "Essay Writing",          href: "/signup?service=Essay+Writing" },
+    { label: "Research Papers",        href: "/signup?service=Research+Papers" },
+    { label: "Dissertations & Theses", href: "/signup?service=Dissertations+%26+Theses" },
+    { label: "Copywriting",            href: "/signup?service=Copywriting" },
+    { label: "Proofreading & Editing", href: "/signup?service=Proofreading+%26+Editing" },
+    { label: "Blog & SEO Content",     href: "/signup?service=Blog+%26+SEO+Content" },
+    { label: "View All Services →",    href: "/services" },
   ],
   Company: [
     { label: "About Us", href: "/about" },
