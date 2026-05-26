@@ -12,6 +12,7 @@ import { TrustIndicators } from "@/components/homepage/TrustIndicators";
 import { FAQ } from "@/components/homepage/FAQ";
 import { Footer } from "@/components/shared/Footer";
 import { CTABanner } from "@/components/homepage/CTABanner";
+import { SamplesPreview } from "@/components/homepage/SamplesPreview";
 
 export const metadata: Metadata = {
   title: "WriteProf — Emergency Writing Marketplace | Get It Done in 1–24 Hours",
@@ -121,6 +122,7 @@ export default function HomePage() {
       <RecentOrders />
       <Testimonials />
       <TrustIndicators />
+      <SamplesPreview />
       <CTABanner />
       <FAQ />
       <Footer />

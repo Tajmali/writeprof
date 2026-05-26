@@ -5,6 +5,9 @@ import { Footer } from "@/components/shared/Footer";
 import Link from "next/link";
 import { BookOpen, FileText, GraduationCap, Clock, ArrowRight, Search } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Sample Assignments — Essays, Research Papers & More",
   description: "Browse real assignment instructions across nursing, business, psychology, and more. Find work similar to yours and get it done by professional writers in 1–24 hours.",
@@ -29,11 +32,12 @@ const levelColors: Record<string, string> = {
 export default async function SamplesPage({
   searchParams,
 }: {
-  searchParams: { subject?: string; type?: string };
+  searchParams: Promise<{ subject?: string; type?: string }>;
 }) {
+  const { subject: subjectParam, type: typeParam } = await searchParams;
   const where: Record<string, unknown> = { isPublished: true };
-  if (searchParams.subject) where.subject = { contains: searchParams.subject, mode: "insensitive" };
-  if (searchParams.type) where.orderType = searchParams.type;
+  if (subjectParam) where.subject = { contains: subjectParam, mode: "insensitive" };
+  if (typeParam) where.orderType = typeParam;
 
   const [samples, subjects, types] = await Promise.all([
     prisma.sampleOrder.findMany({
@@ -87,7 +91,7 @@ export default async function SamplesPage({
           <Link
             href="/samples"
             className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
-              !searchParams.subject && !searchParams.type
+              !subjectParam && !typeParam
                 ? "bg-brand-500/20 border-brand-500/40 text-brand-300"
                 : "border-white/10 text-slate-400 hover:border-white/20 hover:text-white"
             }`}
@@ -99,7 +103,7 @@ export default async function SamplesPage({
               key={t.orderType}
               href={`/samples?type=${encodeURIComponent(t.orderType)}`}
               className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
-                searchParams.type === t.orderType
+                typeParam === t.orderType
                   ? "bg-brand-500/20 border-brand-500/40 text-brand-300"
                   : "border-white/10 text-slate-400 hover:border-white/20 hover:text-white"
               }`}
