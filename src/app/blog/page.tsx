@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/shared/Navbar";
 import { Footer } from "@/components/shared/Footer";
 import Link from "next/link";
-import { Clock, ArrowRight, BookOpen, TrendingUp } from "lucide-react";
+import { Clock, ArrowRight, BookOpen } from "lucide-react";
 
 // Always fetch fresh data — never serve a cached version of the blog list
 export const dynamic = "force-dynamic";
@@ -38,16 +38,35 @@ const categoryColors: Record<string, string> = {
   "Copywriting":       "badge-purple",
 };
 
-export default async function BlogPage() {
-  // Load published posts from database
-  const posts = await prisma.blogPost.findMany({
-    where: { isPublished: true },
-    orderBy: { createdAt: "desc" },
-    take: 12,
-  });
+const POSTS_PER_PAGE = 12;
 
-  const featured = posts[0] || null;
-  const rest = posts.slice(1);
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; category?: string }>;
+}) {
+  const { page: pageParam, category: categoryParam } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10));
+  const categoryFilter = categoryParam ?? "";
+
+  const where = {
+    isPublished: true,
+    ...(categoryFilter ? { category: categoryFilter } : {}),
+  };
+
+  const [posts, total] = await Promise.all([
+    prisma.blogPost.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * POSTS_PER_PAGE,
+      take: POSTS_PER_PAGE,
+    }),
+    prisma.blogPost.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / POSTS_PER_PAGE);
+  const featured = page === 1 && !categoryFilter ? (posts[0] || null) : null;
+  const rest = featured ? posts.slice(1) : posts;
 
   return (
     <div className="min-h-screen bg-[#020817]">
@@ -140,6 +159,35 @@ export default async function BlogPage() {
             </Link>
           )}
 
+          {/* Category filter pills */}
+          {total > 0 && (
+            <div className="flex flex-wrap gap-2 mb-8">
+              <Link
+                href="/blog"
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  !categoryFilter
+                    ? "bg-brand-500 text-white"
+                    : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                All
+              </Link>
+              {Object.keys(categoryColors).map((cat) => (
+                <Link
+                  key={cat}
+                  href={`/blog?category=${encodeURIComponent(cat)}`}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                    categoryFilter === cat
+                      ? "bg-brand-500 text-white"
+                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  {cat}
+                </Link>
+              ))}
+            </div>
+          )}
+
           {/* Post grid */}
           {rest.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -186,6 +234,48 @@ export default async function BlogPage() {
                 </Link>
               ))}
             </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-12">
+              {page > 1 && (
+                <Link
+                  href={`/blog?page=${page - 1}${categoryFilter ? `&category=${encodeURIComponent(categoryFilter)}` : ""}`}
+                  className="px-4 py-2 rounded-lg bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all text-sm font-medium"
+                >
+                  ← Previous
+                </Link>
+              )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <Link
+                  key={p}
+                  href={`/blog?page=${p}${categoryFilter ? `&category=${encodeURIComponent(categoryFilter)}` : ""}`}
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-medium transition-all ${
+                    p === page
+                      ? "bg-brand-500 text-white"
+                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  {p}
+                </Link>
+              ))}
+              {page < totalPages && (
+                <Link
+                  href={`/blog?page=${page + 1}${categoryFilter ? `&category=${encodeURIComponent(categoryFilter)}` : ""}`}
+                  className="px-4 py-2 rounded-lg bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-all text-sm font-medium"
+                >
+                  Next →
+                </Link>
+              )}
+            </div>
+          )}
+
+          {/* Total count */}
+          {total > 0 && (
+            <p className="text-center text-slate-600 text-xs mt-4">
+              Showing {(page - 1) * POSTS_PER_PAGE + 1}–{Math.min(page * POSTS_PER_PAGE, total)} of {total} articles
+            </p>
           )}
         </div>
       </main>
