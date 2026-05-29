@@ -8,7 +8,7 @@ function getJwtSecret(): Uint8Array {
 }
 
 const PUBLIC_ROUTES = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/verify-email", "/blog", "/about", "/contact", "/terms", "/privacy", "/refund", "/help", "/samples", "/services", "/writer/apply", "/ref"];
-const API_PUBLIC_ROUTES = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/google", "/api/auth/verify-email", "/api/auth/resend-verification", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/stats", "/api/blog"];
+const API_PUBLIC_ROUTES = ["/api/auth/login", "/api/auth/signup", "/api/auth/logout", "/api/auth/google", "/api/auth/verify-email", "/api/auth/resend-verification", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/stats", "/api/blog", "/api/support"];
 const CLIENT_ROUTES = ["/dashboard"];
 const WRITER_ROUTES = ["/writer-dashboard"];
 const ADMIN_ROUTES = ["/admin"];
