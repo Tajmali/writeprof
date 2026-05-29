@@ -12,7 +12,7 @@ const DEFAULT_STATS = [
   { value: 4.9,  label: "Average Rating",   suffix: "/5", decimal: true },
 ];
 
-const trustedBy = ["Harvard Students", "Fortune 500 Companies", "Marketing Agencies", "PhD Researchers"];
+const trustedBy = ["Harvard Students", "Marketing Agencies", "PhD Researchers", "Law Students"];
 
 function AnimatedCounter({ value, suffix, decimal = false }: { value: number; suffix?: string; decimal?: boolean }) {
   const [count, setCount] = useState(value); // start at final value — no zero flash
