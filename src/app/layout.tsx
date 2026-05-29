@@ -151,7 +151,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               (function(){
                 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
                 s1.async=true;
-                s1.src='https://embed.tawk.to/6a0ad71f9106c51c398054b3/1iq8ivk0k';
+                s1.src='https://embed.tawk.to/6a0ad71f9106c51c398054b3/default';
                 s1.charset='UTF-8';
                 s1.setAttribute('crossorigin','*');
                 s0.parentNode.insertBefore(s1,s0);
