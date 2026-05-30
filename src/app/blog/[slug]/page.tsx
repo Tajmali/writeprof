@@ -54,6 +54,12 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) notFound();
 
+  // Increment view count — fire-and-forget, never blocks page render
+  prisma.blogPost.update({
+    where: { id: post.id },
+    data: { views: { increment: 1 } },
+  }).catch(() => {});
+
   const relatedPosts = await prisma.blogPost.findMany({
     where: {
       isPublished: true,
