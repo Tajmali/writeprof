@@ -24,6 +24,13 @@ function cleanSubject(raw: string): string {
     .trim() || "Untitled Sample";
 }
 
+// Extract "Customer's subject: 'XXX'" from the email body
+function extractCustomerSubject(body: string): string | null {
+  const match = body.match(/customer['']?s?\s+subject\s*:\s*['"]?([^\n'"]{3,120})['"]?/i);
+  if (match) return match[1].trim();
+  return null;
+}
+
 function cleanBody(raw: string): string {
   const lines = raw.split("\n");
   const out: string[] = [];
@@ -103,7 +110,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Content too short after cleaning (min 50 chars)" }, { status: 400 });
     }
 
-    const cleanedSubject = cleanSubject(subject);
+    // Use "Customer's subject: 'XXX'" from body as title if present,
+    // otherwise fall back to the cleaned email subject line
+    const customerSubject = extractCustomerSubject(rawBody);
+    const cleanedSubject  = customerSubject || cleanSubject(subject);
 
     // ── AI metadata ───────────────────────────────────────────────────────────
     const meta = await extractMetadata(cleanedSubject, cleanedBody);
