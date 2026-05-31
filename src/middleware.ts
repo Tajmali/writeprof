@@ -26,6 +26,7 @@ export async function middleware(req: NextRequest) {
     isPublic(pathname) ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/payments/webhook") ||
+    pathname.startsWith("/api/webhooks/") ||
     pathname.includes(".") // static files
   ) {
     return NextResponse.next();
