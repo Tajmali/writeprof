@@ -51,10 +51,10 @@ async function extractMetadata(subject: string, body: string) {
     const snippet = body.slice(0, 1200);
     const res = await anthropic.messages.create({
       model: "claude-haiku-4-5",
-      max_tokens: 300,
+      max_tokens: 500,
       messages: [{
         role: "user",
-        content: `Classify this writing sample. Reply ONLY with valid JSON.
+        content: `Classify this writing sample for an academic writing marketplace. Reply ONLY with valid JSON.
 
 Subject: "${subject}"
 Content: """${snippet}"""
@@ -64,7 +64,8 @@ Content: """${snippet}"""
   "subjectField": "one of: English, Business, Psychology, History, Biology, Chemistry, Physics, Sociology, Political Science, Economics, Law, Education, Nursing, Marketing, Computer Science, Environmental Science, Philosophy, Communications, Mathematics, General",
   "educationLevel": "one of: High School, Undergraduate, Graduate, PhD",
   "orderType": "one of: Essay, Research Paper, Dissertation Chapter, Case Study, Lab Report, Literature Review, Annotated Bibliography, Coursework, Term Paper, Thesis, Book Report, Article Review",
-  "citationStyle": "APA, MLA, Chicago, Harvard, Vancouver, or null"
+  "citationStyle": "APA, MLA, Chicago, Harvard, Vancouver, or null",
+  "tags": ["8-12 SEO keyword phrases students search for — mix topic keywords like 'nursing essay example' with buyer-intent phrases like 'pay someone to write nursing essay', 'nursing essay sample free', 'undergraduate nursing paper example'. Be specific to the topic."]
 }`,
       }],
     });
@@ -76,6 +77,7 @@ Content: """${snippet}"""
       educationLevel: json.educationLevel || "Undergraduate",
       orderType:      json.orderType      || "Essay",
       citationStyle:  json.citationStyle  || null,
+      tags:           Array.isArray(json.tags) ? json.tags.slice(0, 12) : [],
     };
   } catch {
     return { title: subject, subjectField: "General", educationLevel: "Undergraduate", orderType: "Essay", citationStyle: null };
@@ -143,7 +145,9 @@ export async function POST(req: NextRequest) {
         sources:        null,
         language:       "English (US)",
         description:    cleanedBody,
-        tags:           [meta.subjectField, meta.orderType, meta.educationLevel],
+        tags:           meta.tags.length > 0
+          ? meta.tags
+          : [meta.subjectField, meta.orderType, meta.educationLevel],
         isPublished:    false,
         views:          0,
       },
