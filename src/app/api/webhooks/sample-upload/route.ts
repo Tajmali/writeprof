@@ -109,7 +109,10 @@ export async function POST(req: NextRequest) {
     // ── Validate content ──────────────────────────────────────────────────────
     const cleanedBody = cleanBody(rawBody);
     if (cleanedBody.length < 50) {
-      return NextResponse.json({ error: "Content too short after cleaning (min 50 chars)" }, { status: 400 });
+      return NextResponse.json({
+        error: "too_short",
+        detail: `Body only ${cleanedBody.length} chars after cleaning. Original length: ${rawBody.length}. Subject: "${subject}"`,
+      }, { status: 400 });
     }
 
     // Use "Customer's subject: 'XXX'" from body as title if present,

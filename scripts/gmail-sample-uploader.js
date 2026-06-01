@@ -93,7 +93,16 @@ function uploadSamplesBatch() {
         Logger.log("✅ [" + uploaded + "] " + (result.data && result.data.slug ? result.data.slug : subject.slice(0, 60)));
       } else {
         failed++;
-        Logger.log("❌ Failed (" + code + "): " + subject.slice(0, 60) + " — " + (result.error || "unknown error"));
+        // Log full detail so we know exactly why it failed
+        var reason = result.error || "unknown";
+        var detail = result.detail ? " | " + result.detail.slice(0, 120) : "";
+        Logger.log("❌ [" + code + "] " + subject.slice(0, 60) + " — " + reason + detail);
+        // Still mark as done if content is just too short (nothing we can do)
+        if (result.error === "too_short") {
+          thread.addLabel(label);
+          skipped++;
+          failed--; // count as skipped, not failed
+        }
       }
     } catch (e) {
       failed++;
