@@ -2,7 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Anthropic from "@anthropic-ai/sdk";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// Lazy — only created when a request arrives, so missing key doesn't crash module load
+function getAI(): Anthropic | null {
+  try {
+    const key = process.env.ANTHROPIC_API_KEY;
+    if (!key) return null;
+    return new Anthropic({ apiKey: key });
+  } catch {
+    return null;
+  }
+}
 
 function slugify(text: string): string {
   return (
@@ -47,9 +56,14 @@ function cleanBody(raw: string): string {
 }
 
 async function extractMetadata(subject: string, body: string) {
+  const ai = getAI();
+  if (!ai) {
+    // No API key — fall back to basic defaults, upload still works
+    return { title: subject, subjectField: "General", educationLevel: "Undergraduate", orderType: "Essay", citationStyle: null, tags: [] };
+  }
   try {
     const snippet = body.slice(0, 1200);
-    const res = await anthropic.messages.create({
+    const res = await ai.messages.create({
       model: "claude-haiku-4-5",
       max_tokens: 500,
       messages: [{
