@@ -148,8 +148,12 @@ export async function POST(req: NextRequest) {
       data: { id: sample.id, slug: sample.slug },
     });
 
-  } catch (err) {
+  } catch (err: any) {
     console.error("sample-upload webhook error:", err);
-    return NextResponse.json({ error: "Server error", detail: String(err) }, { status: 500 });
+    return NextResponse.json({
+      error: "Server error",
+      detail: err?.message || String(err),
+      code:   err?.code || null,
+    }, { status: 500 });
   }
 }
