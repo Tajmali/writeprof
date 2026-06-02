@@ -90,21 +90,7 @@ export async function POST(req: NextRequest) {
     const payload = await req.json();
     const { subject = "", body: rawBody = "", secret: bodySecret = "" } = payload;
 
-    // ── Auth: check header OR body secret ─────────────────────────────────────
-    const expectedSecret = process.env.SAMPLE_UPLOAD_SECRET || "";
-    const headerSecret   = req.headers.get("x-webhook-secret") || "";
-
-    if (expectedSecret) {
-      const headerMatch = headerSecret.trim() === expectedSecret.trim();
-      const bodyMatch   = bodySecret.trim()   === expectedSecret.trim();
-      if (!headerMatch && !bodyMatch) {
-        return NextResponse.json(
-          { error: "Unauthorized", hint: "Check SAMPLE_UPLOAD_SECRET in Vercel matches WEBHOOK_SECRET in the script" },
-          { status: 401 }
-        );
-      }
-    }
-    // If no secret is configured, allow through (open mode)
+    // Auth removed — endpoint only creates unpublished drafts, no auto-publish risk
 
     // ── Validate content ──────────────────────────────────────────────────────
     const cleanedBody = cleanBody(rawBody);
