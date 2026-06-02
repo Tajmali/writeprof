@@ -59,11 +59,34 @@ export default function AdminSamplesPage() {
     }
   };
 
+  const [publishingAll, setPublishingAll] = useState(false);
+
+  const publishAllDrafts = async () => {
+    const drafts = samples.filter((s) => !s.isPublished);
+    if (drafts.length === 0) { toast.success("No drafts to publish!"); return; }
+    if (!confirm(`Publish all ${drafts.length} draft samples at once?`)) return;
+    setPublishingAll(true);
+    let done = 0;
+    for (const s of drafts) {
+      await fetch(`/api/admin/samples/${s.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...s, isPublished: true }),
+      });
+      done++;
+    }
+    await fetchSamples();
+    setPublishingAll(false);
+    toast.success(`Published ${done} samples!`);
+  };
+
   const filtered = samples.filter((s) =>
     s.title.toLowerCase().includes(search.toLowerCase()) ||
     s.subject.toLowerCase().includes(search.toLowerCase()) ||
     s.orderType.toLowerCase().includes(search.toLowerCase())
   );
+
+  const draftCount = samples.filter((s) => !s.isPublished).length;
 
   return (
     <div className="p-6 space-y-6">
@@ -75,10 +98,22 @@ export default function AdminSamplesPage() {
             Post real assignment instructions as public SEO pages. Each one is a Google landing page.
           </p>
         </div>
-        <Link href="/admin/samples/new" className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm">
-          <Plus className="w-4 h-4" />
-          New Sample
-        </Link>
+        <div className="flex items-center gap-3">
+          {draftCount > 0 && (
+            <button
+              onClick={publishAllDrafts}
+              disabled={publishingAll}
+              className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm bg-green-600 hover:bg-green-500 disabled:opacity-50"
+            >
+              <Globe className="w-4 h-4" />
+              {publishingAll ? "Publishing..." : `Publish All Drafts (${draftCount})`}
+            </button>
+          )}
+          <Link href="/admin/samples/new" className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm">
+            <Plus className="w-4 h-4" />
+            New Sample
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
