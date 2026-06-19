@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   other: {
-    "google-adsense-account": "ca-pub-8360621658452631",
+    "google-adsense-account": "ca-pub-9412147888851944",
   },
 };
 
@@ -147,7 +147,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Google AdSense */}
         <Script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8360621658452631"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9412147888851944"
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
