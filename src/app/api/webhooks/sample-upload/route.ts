@@ -77,7 +77,7 @@ Content: """${snippet}"""
   "title": "clean descriptive title under 80 chars, no order numbers",
   "subjectField": "one of: English, Business, Psychology, History, Biology, Chemistry, Physics, Sociology, Political Science, Economics, Law, Education, Nursing, Marketing, Computer Science, Environmental Science, Philosophy, Communications, Mathematics, General",
   "educationLevel": "one of: High School, Undergraduate, Graduate, PhD",
-  "orderType": "one of: Essay, Research Paper, Dissertation Chapter, Case Study, Lab Report, Literature Review, Annotated Bibliography, Coursework, Term Paper, Thesis, Book Report, Article Review",
+  "orderType": "one of: Essay, Research Paper, Dissertation Chapter, Case Study, Lab Report, Literature Review, Annotated Bibliography, Coursework, Term Paper, Thesis, Book Report, Article Review, Discussion Post, Reflective Writing",
   "citationStyle": "APA, MLA, Chicago, Harvard, Vancouver, or null",
   "tags": ["8-12 SEO keyword phrases students search for — mix topic keywords like 'nursing essay example' with buyer-intent phrases like 'pay someone to write nursing essay', 'nursing essay sample free', 'undergraduate nursing paper example'. Be specific to the topic."]
 }`,
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
         tags:           meta.tags.length > 0
           ? meta.tags
           : [meta.subjectField, meta.orderType, meta.educationLevel],
-        isPublished:    false,
+        isPublished:    true,
         views:          0,
       },
     });

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Plus, Trash2, Save, Eye, Paperclip, Loader2, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 
-const ORDER_TYPES = ["Essay", "Research Paper", "Dissertation", "Case Study", "Term Paper", "Coursework", "Report", "Business Plan", "Annotated Bibliography", "Literature Review", "Thesis", "Other"];
+const ORDER_TYPES = ["Essay", "Research Paper", "Dissertation", "Case Study", "Term Paper", "Coursework", "Report", "Business Plan", "Annotated Bibliography", "Literature Review", "Thesis", "Discussion Post", "Reflective Writing", "Other"];
 const EDUCATION_LEVELS = ["High School", "College", "Undergraduate", "Masters", "PhD", "Professional"];
 const CITATION_STYLES = ["APA 7th edition", "APA 6th edition", "MLA 9th edition", "MLA 8th edition", "Chicago", "Harvard", "Vancouver", "IEEE", "Turabian", "None / Not specified"];
 const LANGUAGES = ["English (US)", "English (UK)", "English (AU)", "Spanish", "French", "German"];
