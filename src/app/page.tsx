@@ -66,28 +66,53 @@ const homeFaqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "How fast can I get my writing done?",
-      acceptedAnswer: { "@type": "Answer", text: "WriteProf offers 1-hour, 3-hour, 6-hour, 12-hour, and 24-hour turnarounds. Writers start on your order immediately after you place it." },
+      name: "How quickly can you deliver my order?",
+      acceptedAnswer: { "@type": "Answer", text: "Our fastest delivery is 1 hour for emergency orders. Standard deadlines range from 6 to 24 hours depending on complexity and word count. We match you with writers who can meet your exact deadline." },
     },
     {
       "@type": "Question",
-      name: "What types of writing does WriteProf handle?",
-      acceptedAnswer: { "@type": "Answer", text: "Essays, research papers, dissertations, business proposals, blog posts, SEO articles, case studies, reports, copywriting, email campaigns, and more." },
+      name: "Is the content 100% original?",
+      acceptedAnswer: { "@type": "Answer", text: "Absolutely. Every submission passes through Turnitin and Copyscape before delivery. We guarantee 0% plagiarism on every order, or you receive a full refund." },
     },
     {
       "@type": "Question",
-      name: "How much does emergency writing cost?",
-      acceptedAnswer: { "@type": "Answer", text: "Prices start at $15 per page (275 words) for 24-hour orders. Urgency multipliers apply: 12hr costs $26/page, 6hr $37/page, 3hr $52/page, and 1hr $75/page." },
+      name: "What if I'm not satisfied with the work?",
+      acceptedAnswer: { "@type": "Answer", text: "You can request unlimited revisions until you're happy. Payment is held in escrow and only released when you approve the work. If we fail to meet your expectations, we issue a full refund." },
     },
     {
       "@type": "Question",
-      name: "Are the writers qualified?",
-      acceptedAnswer: { "@type": "Answer", text: "All writers are manually vetted — PhD holders, Masters graduates, and published authors. They pass a strict application process before accessing any orders." },
+      name: "How are writers verified?",
+      acceptedAnswer: { "@type": "Answer", text: "Every writer undergoes a 7-step vetting process including identity verification, academic credential check, writing test, English proficiency assessment, background check, and a probationary period. Only 8% of applicants are accepted." },
     },
     {
       "@type": "Question",
-      name: "What if the writer misses my deadline?",
-      acceptedAnswer: { "@type": "Answer", text: "You receive a full automatic refund if a writer fails to deliver by your deadline. Payments are held in escrow and only released after you approve the work." },
+      name: "Is my information kept confidential?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes. We use bank-grade encryption and never share your personal information, order details, or communication with any third party. Your privacy is protected by our iron-clad NDA policy." },
+    },
+    {
+      "@type": "Question",
+      name: "What payment methods do you accept?",
+      acceptedAnswer: { "@type": "Answer", text: "We accept all major cards (Visa, Mastercard), bank transfers, and mobile money through Paystack — Nigeria's most trusted payment gateway. All transactions are encrypted and secure." },
+    },
+    {
+      "@type": "Question",
+      name: "Can I chat with my writer?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes! Once a writer is assigned to your order, a direct chat channel opens instantly. You can share additional instructions, clarify requirements, and track progress in real-time." },
+    },
+    {
+      "@type": "Question",
+      name: "What happens if my writer misses the deadline?",
+      acceptedAnswer: { "@type": "Answer", text: "In the rare event of a missed deadline, you receive a full refund immediately — no questions asked. We've maintained a 98% on-time delivery rate across 12,847+ orders." },
+    },
+    {
+      "@type": "Question",
+      name: "Do you offer academic writing services?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes. We handle essays, research papers, dissertations, case studies, lab reports, and more. All academic work follows proper citation styles (APA, MLA, Chicago, Harvard) as required." },
+    },
+    {
+      "@type": "Question",
+      name: "How does the Emergency Mode work?",
+      acceptedAnswer: { "@type": "Answer", text: "Emergency Mode prioritizes your order above all others. You're matched with a top-rated writer in under 5 minutes, and they start immediately. This is available for deadlines as short as 1 hour. A $50 emergency activation fee applies." },
     },
   ],
 };
