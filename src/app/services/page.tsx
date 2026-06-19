@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 
 const services = [
   {
+    slug: "essay-writing",
     icon: GraduationCap,
     name: "Essay Writing",
     color: "from-brand-600 to-brand-400",
@@ -40,6 +41,7 @@ const services = [
     price: "From $15/page",
   },
   {
+    slug: "research-papers",
     icon: FlaskConical,
     name: "Research Papers",
     color: "from-cyan-600 to-cyan-400",
@@ -51,6 +53,7 @@ const services = [
     price: "From $26/page",
   },
   {
+    slug: "dissertations",
     icon: BookMarked,
     name: "Dissertations & Theses",
     color: "from-violet-600 to-violet-400",
@@ -62,6 +65,7 @@ const services = [
     price: "From $37/page",
   },
   {
+    slug: "proofreading-editing",
     icon: FileText,
     name: "Proofreading & Editing",
     color: "from-teal-600 to-teal-400",
@@ -73,6 +77,7 @@ const services = [
     price: "From $8/page",
   },
   {
+    slug: "copywriting",
     icon: Megaphone,
     name: "Copywriting",
     color: "from-pink-600 to-pink-400",
@@ -84,6 +89,7 @@ const services = [
     price: "From $20/page",
   },
   {
+    slug: "blog-seo-content",
     icon: Globe,
     name: "Blog & SEO Content",
     color: "from-green-600 to-green-400",
@@ -95,6 +101,7 @@ const services = [
     price: "From $15/page",
   },
   {
+    slug: "business-writing",
     icon: Briefcase,
     name: "Business Writing",
     color: "from-amber-600 to-amber-400",
@@ -106,6 +113,7 @@ const services = [
     price: "From $26/page",
   },
   {
+    slug: "case-studies",
     icon: BarChart2,
     name: "Case Studies",
     color: "from-orange-600 to-orange-400",
@@ -117,6 +125,7 @@ const services = [
     price: "From $26/page",
   },
   {
+    slug: "lab-reports",
     icon: Microscope,
     name: "Lab Reports & STEM",
     color: "from-sky-600 to-sky-400",
@@ -128,6 +137,7 @@ const services = [
     price: "From $37/page",
   },
   {
+    slug: "presentations",
     icon: Presentation,
     name: "Presentations & Slides",
     color: "from-rose-600 to-rose-400",
@@ -139,6 +149,7 @@ const services = [
     price: "From $15/slide",
   },
   {
+    slug: "email-writing",
     icon: Mail,
     name: "Email & Communication",
     color: "from-indigo-600 to-indigo-400",
@@ -150,6 +161,7 @@ const services = [
     price: "From $20/piece",
   },
   {
+    slug: "cv-resume",
     icon: UserCheck,
     name: "CVs, Resumes & Cover Letters",
     color: "from-lime-600 to-lime-400",
@@ -244,7 +256,7 @@ export default function ServicesPage() {
           {services.map((svc) => (
             <Link
               key={svc.name}
-              href={`/signup?service=${encodeURIComponent(svc.name)}`}
+              href={`/services/${svc.slug}`}
               className="glass-card p-6 hover:border-brand-500/30 transition-all duration-300 group flex flex-col"
             >
               {/* Icon */}
