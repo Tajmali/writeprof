@@ -12,7 +12,7 @@ const steps = [
     description:
       "Fill in your task details — title, description, deadline, word count, and academic level. Upload any reference materials. Takes less than 2 minutes.",
     color: "from-brand-600 to-brand-400",
-    glowColor: "rgba(14, 165, 233, 0.3)",
+    glowColor: "rgba(239, 108, 77, 0.3)",
     features: ["Upload files instantly", "Set exact deadline", "Choose urgency level"],
   },
   {
@@ -52,7 +52,7 @@ export function HowItWorks() {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="how-it-works" className="py-24 lg:py-32 relative" ref={ref}>
+    <section id="how-it-works" className="py-24 lg:py-32 relative bg-[#fff8f6]" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -64,13 +64,13 @@ export function HowItWorks() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-sm font-semibold mb-4">
             How It Works
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-4">
             From Panic to{" "}
             <span className="gradient-text">Delivered</span>
             <br />
             in 4 Simple Steps
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto">
             We've perfected the emergency writing workflow so you spend zero time figuring things
             out and all your time breathing easy.
           </p>
@@ -79,7 +79,7 @@ export function HowItWorks() {
         {/* Steps */}
         <div className="relative">
           {/* Connection line */}
-          <div className="hidden lg:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          <div className="hidden lg:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {steps.map((step, i) => (
@@ -93,11 +93,11 @@ export function HowItWorks() {
                 {/* Arrow between steps */}
                 {i < steps.length - 1 && (
                   <div className="hidden lg:flex absolute -right-5 top-12 z-10 w-10 h-10 items-center justify-center">
-                    <ArrowRight className="w-4 h-4 text-slate-600" />
+                    <ArrowRight className="w-4 h-4 text-slate-300" />
                   </div>
                 )}
 
-                <div className="glass-card p-6 h-full hover:border-white/20 transition-all duration-300 group-hover:-translate-y-2">
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 h-full hover:border-brand-300 hover:shadow-md transition-all duration-300 group-hover:-translate-y-2">
                   {/* Step number & icon */}
                   <div className="flex items-start justify-between mb-6">
                     <div
@@ -110,17 +110,17 @@ export function HowItWorks() {
                     >
                       <step.icon className="w-7 h-7 text-white" />
                     </div>
-                    <span className="text-5xl font-black text-white/5 group-hover:text-white/8 transition-all">
+                    <span className="text-5xl font-black text-slate-100 group-hover:text-slate-200 transition-all">
                       {step.step}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-4">{step.description}</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed mb-4">{step.description}</p>
 
                   <ul className="space-y-2">
                     {step.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-xs text-slate-500">
+                      <li key={f} className="flex items-center gap-2 text-xs text-slate-400">
                         <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${step.color} flex-shrink-0`} />
                         {f}
                       </li>
@@ -144,7 +144,7 @@ export function HowItWorks() {
             Start Your First Order — Free
             <ArrowRight className="w-5 h-5" />
           </a>
-          <p className="text-slate-600 text-sm mt-3">No credit card required to sign up</p>
+          <p className="text-slate-400 text-sm mt-3">No credit card required to sign up</p>
         </motion.div>
       </div>
     </section>

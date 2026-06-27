@@ -6,10 +6,10 @@
 
 /* ── Light mode (default) ── */
 :root {
-  --brand-50: #f0f9ff;
-  --brand-500: #0ea5e9;
-  --brand-600: #0284c7;
-  --brand-700: #0369a1;
+  --brand-50: #fff8f6;
+  --brand-500: #ef6c4d;
+  --brand-600: #e04f2f;
+  --brand-700: #b83c22;
   --navy-900: #0f0c29;
   --navy-800: #1e1b4b;
 
@@ -64,16 +64,16 @@ body {
   background: #0f172a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e40af;
+  background: #b83c22;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #0ea5e9;
+  background: #ef6c4d;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(14, 165, 233, 0.3);
+  background: rgba(239, 108, 77, 0.3);
   color: #e2e8f0;
 }
 
