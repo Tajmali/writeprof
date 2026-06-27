@@ -6,12 +6,12 @@ import { Zap, BookOpen, ArrowRight } from "lucide-react";
 import { SUBJECTS } from "./[slug]/data";
 
 export const metadata: Metadata = {
-  title: "Academic Writing by Subject — Essays, Papers & More | WriteProf",
+  title: "Freelance Writing by Subject — Essays, Papers & More | WriteProf",
   description: "Find expert writing help for your specific subject — nursing, psychology, law, business, history, and more. Rush delivery from 1 hour. From $15/page.",
   alternates: { canonical: "https://writeprof.com/subjects" },
-  keywords: ["academic writing by subject", "subject specific essay help", "nursing essay service", "psychology essay service", "law essay service", "business essay service"],
+  keywords: ["freelance writing by subject", "subject specific writing help", "nursing writing service", "psychology paper service", "law writing service", "business writing service"],
   openGraph: {
-    title: "Academic Writing by Subject — WriteProf",
+    title: "Freelance Writing by Subject — WriteProf",
     description: "Expert writing help for every subject. Rush delivery from 1 hour.",
     url: "https://writeprof.com/subjects",
     type: "website",

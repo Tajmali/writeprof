@@ -6,7 +6,7 @@ import { BookOpen, Briefcase, PenTool, FlaskConical, Globe, Megaphone, FileText,
 import Link from "next/link";
 
 const categories = [
-  { icon: GraduationCap, label: "Academic Writing", count: 3421, color: "from-brand-600 to-brand-400", urgency: "1–24 hrs", description: "Essays, theses, dissertations, coursework" },
+  { icon: GraduationCap, label: "Essay & Paper Writing", count: 3421, color: "from-brand-600 to-brand-400", urgency: "1–24 hrs", description: "Essays, theses, dissertations, coursework" },
   { icon: Briefcase, label: "Business Writing", count: 1847, color: "from-violet-600 to-violet-400", urgency: "2–24 hrs", description: "Reports, proposals, business plans, memos" },
   { icon: Megaphone, label: "Copywriting", count: 2103, color: "from-pink-600 to-pink-400", urgency: "1–12 hrs", description: "Ad copy, landing pages, product descriptions" },
   { icon: Globe, label: "Blog & SEO Content", count: 1562, color: "from-green-600 to-green-400", urgency: "3–24 hrs", description: "Blog posts, articles, SEO-optimized content" },
@@ -41,7 +41,7 @@ export function UrgencyCategories() {
             </span>
           </h2>
           <p className="text-slate-400 text-lg max-w-xl mx-auto">
-            From academic essays to marketing copy — our writers cover every niche with
+            From essays to marketing copy — our freelance writers cover every niche with
             expert-level precision.
           </p>
         </motion.div>

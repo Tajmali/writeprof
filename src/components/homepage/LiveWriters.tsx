@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { Star, CheckCircle, Clock } from "lucide-react";
 
 const writers = [
-  { name: "Dr. Sarah K.", avatar: "SK", specialty: "Academic Writing & Research", rating: 4.9, orders: 847, onTime: 99, level: "PhD", status: "available", tags: ["Essays", "Dissertations", "Research Papers"] },
+  { name: "Dr. Sarah K.", avatar: "SK", specialty: "Research & Essay Writing", rating: 4.9, orders: 847, onTime: 99, level: "PhD", status: "available", tags: ["Essays", "Dissertations", "Research Papers"] },
   { name: "James O.", avatar: "JO", specialty: "Copywriting & Marketing", rating: 4.8, orders: 1203, onTime: 97, level: "Professional", status: "available", tags: ["Ads", "Landing Pages", "Email Copy"] },
   { name: "Prof. Amara", avatar: "PA", specialty: "Literature & Creative Writing", rating: 5.0, orders: 432, onTime: 100, level: "PhD", status: "available", tags: ["Essays", "Creative Writing", "Poetry"] },
   { name: "Michael C.", avatar: "MC", specialty: "Business & Technical Writing", rating: 4.7, orders: 621, onTime: 96, level: "Masters", status: "busy", tags: ["Reports", "Proposals", "Technical Docs"] },

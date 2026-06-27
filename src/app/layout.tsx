@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     "emergency writing service",
     "urgent essay writing",
     "professional writing marketplace",
-    "fast academic writing",
+    "fast freelance writing",
     "deadline writing help",
     "research paper writing",
     "urgent copywriting",

@@ -13,7 +13,7 @@ const faqs = [
   { q: "What payment methods do you accept?", a: "We accept all major cards (Visa, Mastercard), bank transfers, and mobile money through Paystack — Nigeria's most trusted payment gateway. All transactions are encrypted and secure." },
   { q: "Can I chat with my writer?", a: "Yes! Once a writer is assigned to your order, a direct chat channel opens instantly. You can share additional instructions, clarify requirements, and track progress in real-time." },
   { q: "What happens if my writer misses the deadline?", a: "In the rare event of a missed deadline, you receive a full refund immediately — no questions asked. We've maintained a 98% on-time delivery rate across 12,847+ orders." },
-  { q: "Do you offer academic writing services?", a: "Yes. We handle essays, research papers, dissertations, case studies, lab reports, and more. All academic work follows proper citation styles (APA, MLA, Chicago, Harvard) as required." },
+  { q: "What types of writing projects do you cover?", a: "We cover essays, research papers, dissertations, case studies, lab reports, blog content, copywriting, business writing, CVs, and more. Our freelance writers handle any writing project — all citation styles supported (APA, MLA, Chicago, Harvard)." },
   { q: "How does the Emergency Mode work?", a: "Emergency Mode prioritizes your order above all others. You're matched with a top-rated writer in under 5 minutes, and they start immediately. This is available for deadlines as short as 1 hour. A $50 emergency activation fee applies." },
 ];
 

@@ -28,7 +28,7 @@ const testimonials = [
     role: "Undergraduate, University of Melbourne",
     avatar: "SW",
     rating: 5,
-    text: "Finals season is always brutal. WriteProf has pulled me through so many tight deadlines I've lost count. The writers understand Australian academic standards perfectly — APA, Harvard referencing, everything. And every paper is 100% original.",
+    text: "Finals season is always brutal. WriteProf has pulled me through so many tight deadlines I've lost count. The writers understand citation standards perfectly — APA, Harvard referencing, everything. And every paper is 100% original.",
     highlight: "Used 12+ times",
     color: "from-green-600 to-green-400",
   },

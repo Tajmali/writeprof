@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   keywords: [
     "emergency writing service",
     "urgent essay writing",
-    "rush academic writing",
+    "rush freelance writing",
     "same day essay writer",
     "1 hour essay writing service",
     "deadline writing help",
@@ -106,8 +106,8 @@ const homeFaqSchema = {
     },
     {
       "@type": "Question",
-      name: "Do you offer academic writing services?",
-      acceptedAnswer: { "@type": "Answer", text: "Yes. We handle essays, research papers, dissertations, case studies, lab reports, and more. All academic work follows proper citation styles (APA, MLA, Chicago, Harvard) as required." },
+      name: "What types of writing projects do you cover?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes. Our freelance writers handle essays, research papers, dissertations, case studies, lab reports, blog content, copywriting, business writing, and more. All citation styles supported (APA, MLA, Chicago, Harvard)." },
     },
     {
       "@type": "Question",

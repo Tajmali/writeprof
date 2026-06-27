@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   keywords: [
     "emergency essay writing", "rush research paper", "urgent dissertation help",
     "same day essay writer", "1 hour writing service", "copywriting service",
-    "proofreading service", "academic writing help", "business writing service",
+    "proofreading service", "professional writing help", "business writing service",
   ],
   openGraph: {
     title: "Emergency Writing Services — WriteProf",

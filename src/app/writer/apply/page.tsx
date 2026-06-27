@@ -39,8 +39,8 @@ type Step2 = z.infer<typeof step2Schema>;
 type Step3 = z.infer<typeof step3Schema>;
 
 const SPECIALIZATIONS = [
-  "Academic Writing", "Creative Writing", "Technical Writing", "Business Writing",
-  "Research Papers", "Essay Writing", "Content Writing", "Copywriting",
+  "Essay & Research Writing", "Creative Writing", "Technical Writing", "Business Writing",
+  "Research Papers", "Freelance Writing", "Content Writing", "Copywriting",
   "Thesis & Dissertations", "SEO Writing", "Journalism", "Scientific Writing",
 ];
 
@@ -150,7 +150,7 @@ export default function WriterApplyPage() {
 
           <div className="mt-8 p-4 rounded-xl bg-brand-500/10 border border-brand-500/20">
             <p className="text-xs text-gray-400 leading-relaxed">
-              <span className="text-brand-400 font-semibold">🎓 Academic writers</span> on WriteProf earn an average of $850/month completing assignments, essays, and research papers.
+              <span className="text-brand-400 font-semibold">✍️ Professional writers</span> on WriteProf earn an average of $850/month completing essays, research papers, and freelance writing projects.
             </p>
           </div>
         </div>

@@ -207,7 +207,7 @@ export default async function BlogPostPage({ params }: Props) {
             <div>
               <p className="font-semibold text-white">{post.author || "WriteProf Team"}</p>
               <p className="text-sm text-gray-400 mt-1">
-                WriteProf expert contributor sharing insights on academic writing, career growth, and platform updates.
+                WriteProf expert contributor sharing insights on professional writing, career growth, and platform updates.
               </p>
             </div>
           </div>
