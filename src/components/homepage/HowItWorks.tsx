@@ -11,8 +11,10 @@ const steps = [
     title: "Submit Your Order",
     description:
       "Fill in your task details — title, description, deadline, word count, and academic level. Upload any reference materials. Takes less than 2 minutes.",
-    color: "from-brand-600 to-brand-400",
-    glowColor: "rgba(239, 108, 77, 0.3)",
+    dotColor: "bg-brand-500",
+    iconBg: "#fde8e3",
+    iconBorder: "#fbc5b8",
+    iconColor: "#e04f2f",
     features: ["Upload files instantly", "Set exact deadline", "Choose urgency level"],
   },
   {
@@ -21,8 +23,10 @@ const steps = [
     title: "Writer Gets Matched",
     description:
       "Our smart matching system immediately alerts available writers. For emergency orders, we assign the best available writer within minutes.",
-    color: "from-violet-600 to-violet-400",
-    glowColor: "rgba(139, 92, 246, 0.3)",
+    dotColor: "bg-violet-500",
+    iconBg: "#ede9fe",
+    iconBorder: "#ddd6fe",
+    iconColor: "#7c3aed",
     features: ["AI-powered matching", "Instant writer alerts", "Skill-based assignment"],
   },
   {
@@ -31,8 +35,10 @@ const steps = [
     title: "Work Gets Done",
     description:
       "Your writer starts immediately. Watch real-time progress, chat with your writer, and receive updates as your deadline approaches.",
-    color: "from-orange-500 to-amber-400",
-    glowColor: "rgba(249, 115, 22, 0.3)",
+    dotColor: "bg-orange-500",
+    iconBg: "#fff7ed",
+    iconBorder: "#fed7aa",
+    iconColor: "#ea580c",
     features: ["Real-time tracking", "Live chat with writer", "Progress updates"],
   },
   {
@@ -41,8 +47,10 @@ const steps = [
     title: "Delivered & Approved",
     description:
       "Download your completed work. Request free revisions if needed. Release payment only when you're 100% satisfied.",
-    color: "from-green-500 to-emerald-400",
-    glowColor: "rgba(34, 197, 94, 0.3)",
+    dotColor: "bg-green-500",
+    iconBg: "#f0fdf4",
+    iconBorder: "#bbf7d0",
+    iconColor: "#16a34a",
     features: ["Free revisions included", "Escrow-protected payment", "Satisfaction guaranteed"],
   },
 ];
@@ -103,12 +111,11 @@ export function HowItWorks() {
                     <div
                       className="w-14 h-14 rounded-2xl flex items-center justify-center"
                       style={{
-                        background: `linear-gradient(135deg, ${step.glowColor.replace("0.3", "0.15")}, ${step.glowColor.replace("0.3", "0.05")})`,
-                        border: `1px solid ${step.glowColor}`,
-                        boxShadow: `0 0 20px ${step.glowColor}`,
+                        background: step.iconBg,
+                        border: `1.5px solid ${step.iconBorder}`,
                       }}
                     >
-                      <step.icon className="w-7 h-7 text-white" />
+                      <step.icon className="w-7 h-7" style={{ color: step.iconColor }} />
                     </div>
                     <span className="text-5xl font-black text-slate-100 group-hover:text-slate-200 transition-all">
                       {step.step}
@@ -121,7 +128,7 @@ export function HowItWorks() {
                   <ul className="space-y-2">
                     {step.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-xs text-slate-400">
-                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${step.color} flex-shrink-0`} />
+                        <div className={`w-1.5 h-1.5 rounded-full ${step.dotColor} flex-shrink-0`} />
                         {f}
                       </li>
                     ))}
