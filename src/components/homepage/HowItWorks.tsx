@@ -15,6 +15,7 @@ const steps = [
     iconBg: "#fde8e3",
     iconBorder: "#fbc5b8",
     iconColor: "#e04f2f",
+    numColor: "#fbc5b8",
     features: ["Upload files instantly", "Set exact deadline", "Choose urgency level"],
   },
   {
@@ -27,6 +28,7 @@ const steps = [
     iconBg: "#ede9fe",
     iconBorder: "#ddd6fe",
     iconColor: "#7c3aed",
+    numColor: "#ddd6fe",
     features: ["AI-powered matching", "Instant writer alerts", "Skill-based assignment"],
   },
   {
@@ -39,6 +41,7 @@ const steps = [
     iconBg: "#fff7ed",
     iconBorder: "#fed7aa",
     iconColor: "#ea580c",
+    numColor: "#fed7aa",
     features: ["Real-time tracking", "Live chat with writer", "Progress updates"],
   },
   {
@@ -51,6 +54,7 @@ const steps = [
     iconBg: "#f0fdf4",
     iconBorder: "#bbf7d0",
     iconColor: "#16a34a",
+    numColor: "#bbf7d0",
     features: ["Free revisions included", "Escrow-protected payment", "Satisfaction guaranteed"],
   },
 ];
@@ -117,7 +121,7 @@ export function HowItWorks() {
                     >
                       <step.icon className="w-7 h-7" style={{ color: step.iconColor }} />
                     </div>
-                    <span className="text-5xl font-black text-slate-100 group-hover:text-slate-200 transition-all">
+                    <span className="text-5xl font-black transition-all" style={{ color: step.numColor }}>
                       {step.step}
                     </span>
                   </div>
