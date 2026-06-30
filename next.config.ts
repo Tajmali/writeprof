@@ -45,6 +45,14 @@ const nextConfig: NextConfig = {
     ],
   },
   serverExternalPackages: ["@prisma/client", "prisma"],
+  async redirects() {
+    return [
+      // Blog posts deleted/renamed — 301 redirects to recover any SEO value Google assigned
+      { source: "/blog/copywriting-that-converts",  destination: "/blog", permanent: true },
+      { source: "/blog/how-to-write-essay-in-2-hours", destination: "/blog", permanent: true },
+      { source: "/blog/apa-mla-citation-guide-2026",  destination: "/blog", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
