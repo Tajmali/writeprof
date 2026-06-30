@@ -23,7 +23,7 @@ const footerLinks = {
     { label: "Become a Writer", href: "/writer/apply" },
     { label: "Writer Dashboard", href: "/writer-dashboard" },
     { label: "Writer Guidelines", href: "/help" },
-    { label: "Payment Info", href: "/writer/apply" },
+    { label: "Payment Info", href: "/writer/apply#payment-info" },
     { label: "Contact Support", href: "/contact" },
   ],
   Support: [

@@ -153,6 +153,13 @@ export default function WriterApplyPage() {
               <span className="text-brand-400 font-semibold">✍️ Professional writers</span> on WriteProf earn an average of $850/month completing essays, research papers, and freelance writing projects.
             </p>
           </div>
+
+          <div id="payment-info" className="mt-4 p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+            <p className="text-xs text-green-400 font-semibold mb-1.5">Payment Schedule</p>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Writers are paid <span className="text-white font-medium">bi-monthly on the 1st and 15th</span> of each month. Earnings are released to your wallet instantly when a client approves their order.
+            </p>
+          </div>
         </div>
 
         <p className="text-xs text-gray-600">
