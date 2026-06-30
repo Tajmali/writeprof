@@ -36,7 +36,7 @@ export default function NewSamplePage() {
     language: "English (US)",
     description: "",
     tags: "",
-    isPublished: false,
+    isPublished: true,
   });
 
   const update = (field: string, value: string | boolean) =>
