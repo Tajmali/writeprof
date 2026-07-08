@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowLeft, FileText, GraduationCap, BookOpen, Globe, Hash, Paperclip, Download, Eye } from "lucide-react";
+import { ViewTracker } from "@/components/samples/ViewTracker";
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -39,8 +40,7 @@ export default async function SampleOrderPage({ params }: Props) {
 
   if (!sample) notFound();
 
-  // Increment views
-  prisma.sampleOrder.update({ where: { id: sample.id }, data: { views: { increment: 1 } } }).catch(() => {});
+  // View tracking is handled client-side via ViewTracker to survive serverless cold shutdowns
 
   const relatedSamples = await prisma.sampleOrder.findMany({
     where: { isPublished: true, subject: sample.subject, slug: { not: sample.slug } },
@@ -60,6 +60,7 @@ export default async function SampleOrderPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[#0a0f1e]">
+      <ViewTracker id={sample.id} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       {/* Nav */}
