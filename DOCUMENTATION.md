@@ -343,6 +343,9 @@ Set all variables from `.env.example` in your Vercel project settings:
 ## Admin Guide
 
 ### Default Admin Credentials (after seed)
+
+> **⚠️ Development only.** These credentials are inserted by the seed script and are publicly known. Change them immediately before deploying to any non-local environment.
+
 - Email: `admin@writeprof.com`
 - Password: `Admin@WriteProf2026`
 
@@ -385,6 +388,8 @@ Default: 20% (configurable in System Settings → `platform_commission`)
 ---
 
 ## Sample Login Credentials
+
+> **⚠️ Development only.** All passwords below are inserted by the seed script and are publicly known. Never use these accounts or passwords in staging or production.
 
 After running `npm run db:seed`:
 
